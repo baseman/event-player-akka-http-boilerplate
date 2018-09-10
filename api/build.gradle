@@ -1,0 +1,49 @@
+apply plugin: 'kotlin-platform-jvm'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+buildscript {
+  ext.kotlin_version = '1.2.51'
+
+  repositories {
+    mavenCentral()
+    maven { url "http://dl.bintray.com/jetbrains/spek" }
+    maven { url "http://repo.spring.io/plugins-release/" }
+  }
+  dependencies {
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
+  }
+}
+
+repositories {
+  mavenCentral()
+  maven { url "http://dl.bintray.com/jetbrains/spek" }
+  maven { url "http://repo.spring.io/plugins-release/" }
+  maven { url "http://packages.confluent.io/maven/" }
+}
+
+
+junitPlatform {
+  filters {
+    engines {
+      include 'spek'
+    }
+  }
+}
+
+
+dependencies {
+  compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+  compile("org.jetbrains.kotlin:kotlin-reflect")
+
+  expectedBy project(":event-player")
+
+  testCompile 'org.jetbrains.spek:spek-api:1.1.5'
+  testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
+  testCompile "org.amshove.kluent:kluent:1.24"
+
+  compile("com.typesafe.akka:akka-http_2.12:10.0.9")
+  compile("com.typesafe.akka:akka-http-jackson_2.12:10.0.9")
+
+  testCompile("com.typesafe.akka:akka-http-testkit_2.12:10.0.9")
+}

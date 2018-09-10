@@ -1,0 +1,24 @@
+group 'my.artifact.myeventplayer.common'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.2.51'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin-platform-common'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':event-player')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+}

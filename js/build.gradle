@@ -1,0 +1,30 @@
+apply plugin: 'kotlin-platform-js'
+
+buildscript {
+    ext.kotlin_version = '1.2.51'
+
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin2js'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    expectedBy project(':event-player')
+    expectedBy project(':common')
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+}
+
+[compileKotlin2Js, compileTestKotlin2Js]*.configure {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "${projectDir}/build/js/myeventplayer.js"
+    kotlinOptions.moduleKind = "commonjs"
+}
