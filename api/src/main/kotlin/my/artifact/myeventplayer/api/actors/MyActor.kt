@@ -1,9 +1,13 @@
-package co.remotectrl.api.actors
+package my.artifact.myeventplayer.api.actors
 
 import akka.actor.*
 import akka.event.*
-import co.remotectrl.api.services.MyService
+import my.artifact.myeventplayer.api.services.MyService
+import org.springframework.context.annotation.Scope
+import org.springframework.stereotype.Component
 
+@Component
+@Scope("prototype")
 class MyActor(private val myService: MyService) : UntypedActor() {
     private val log = Logging.getLogger(context().system(), this)
 
