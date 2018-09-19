@@ -11,7 +11,7 @@ class ApplicationInitializer : ApplicationContextInitializer<GenericApplicationC
     companion object BeansInitializer{
         fun get() = beans {
             bean<SpringExtension>()
-            bean<ApplicationConfig>() //todo identify correctplace for initializing system
+            bean<ApplicationConfig>()
             bean<MyService>()
             bean("myActor") {
                 MyActor(ref())

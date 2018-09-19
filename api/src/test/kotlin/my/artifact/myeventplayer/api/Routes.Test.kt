@@ -11,7 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 
-@ContextConfiguration(classes = [(ApplicationConfig::class)], initializers = arrayOf(ApplicationInitializer::class))
+@ContextConfiguration(
+        classes = [(ApplicationConfig::class)],
+        initializers = [(ApplicationInitializer::class)]
+)
 @RunWith(SpringRunner::class)
 @SpringBootTest
 class RoutesTest : JUnitRouteTest() {

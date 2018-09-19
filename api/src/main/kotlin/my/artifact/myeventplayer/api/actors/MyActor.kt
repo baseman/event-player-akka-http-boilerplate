@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component
 @Component
 @Scope("prototype")
 class MyActor(private val myService: MyService) : UntypedActor() {
-    private val log = Logging.getLogger(context().system(), this)
+
+    private val log = Logging.getLogger(context.system(), this)
 
     @Throws(Throwable::class)
     override fun onReceive(message: Any) {
