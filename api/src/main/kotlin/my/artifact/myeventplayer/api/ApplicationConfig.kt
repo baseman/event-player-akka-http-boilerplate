@@ -10,15 +10,16 @@ import org.springframework.context.annotation.*
 class ApplicationConfig @Autowired
 constructor(private val applicationContext: ApplicationContext, private val springAkkaExtension: SpringExtension) {
 
+    val system: ActorSystem = ActorSystem.create("default", ConfigFactory.load())
+
     @Bean
     fun actorSystem(): ActorSystem {
-        val system = ActorSystem.create("default", akkaConfiguration())
         springAkkaExtension.setApplicationContext(applicationContext)
         return system
     }
 
-    @Bean
-    fun akkaConfiguration(): Config {
-        return ConfigFactory.load()
-    }
+//    @Bean
+//    fun akkaConfiguration(): Config {
+//        return ConfigFactory.load()
+//    }
 }
