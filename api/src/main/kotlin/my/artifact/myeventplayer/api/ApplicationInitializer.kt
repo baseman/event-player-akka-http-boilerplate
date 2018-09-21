@@ -2,6 +2,7 @@ package my.artifact.myeventplayer.api
 
 import my.artifact.myeventplayer.api.actors.MyActor
 import my.artifact.myeventplayer.api.services.MyService
+import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
@@ -16,7 +17,7 @@ class ApplicationInitializer : ApplicationContextInitializer<GenericApplicationC
             bean("myActor") {
                 MyActor(ref())
             }
-            bean<MyRouter>()
+            bean<MyRouter<MyAggregate>>()
             bean<ApplicationServer>()
         }
     }

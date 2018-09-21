@@ -5,11 +5,12 @@ import akka.http.javadsl.ConnectHttp
 import akka.http.javadsl.Http
 import akka.http.javadsl.server.Route
 import akka.stream.ActorMaterializer
+import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-class ApplicationServer(val system: ActorSystem, router: MyRouter) {
+class ApplicationServer(val system: ActorSystem, router: MyRouter<MyAggregate>) {
 
     val route: Route = router.createRoute()
 

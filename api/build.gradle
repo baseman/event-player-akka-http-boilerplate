@@ -63,6 +63,9 @@ dependencies {
   compile('com.typesafe.akka:akka-http-jackson_2.12:10.1.4')
   compile('com.typesafe.akka:akka-stream_2.12:2.5.16')
 
+  expectedBy project(':event-player')
+  compile project(':jvm')
+
   testCompile 'com.typesafe.akka:akka-http-testkit_2.12:10.1.4'
   testCompile 'junit:junit:4.12'
 
