@@ -43,7 +43,7 @@ class MyRouter<TAggregate: Aggregate<TAggregate>>(system: ActorSystem, springExt
         return post {
             val deserializer = Jackson.unmarshaller(TCommand::class.java)
 
-            val type = object : TypeReference<TCommand>() {}.type //todo: remove
+            val type = object : TypeReference<TAggregate>() {}.type //todo: remove
 
             entity<TCommand>(deserializer) { command ->
                 val cmdPosted = PatternsCS
