@@ -5,7 +5,7 @@ This boilerplate is to help initialize a my.artifact.myeventplayer.common.aggreg
 
 Clone this project and all sub modules to start a kotlin module with boilerplate to get you started targeting multiple platforms...
 
-    git clone --recurse-submodules https://github.com/baseman/event-player-boilerplate.git
+    git clone --recurse-submodules https://github.com/baseman/event-player-akka-http-boilerplate.git
 
 For updating submodules you can use the following my.artifact.myeventplayer.common.aggregate.command...
 
