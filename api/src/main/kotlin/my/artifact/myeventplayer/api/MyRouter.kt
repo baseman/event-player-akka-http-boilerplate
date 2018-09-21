@@ -14,6 +14,7 @@ import akka.util.Timeout
 import co.remotectrl.eventplayer.Aggregate
 import co.remotectrl.eventplayer.AggregateId
 import co.remotectrl.eventplayer.PlayCommand
+import com.fasterxml.jackson.core.type.TypeReference
 import my.artifact.myeventplayer.api.actors.AggregateMessages
 import org.springframework.stereotype.Component
 import scala.concurrent.duration.Duration
@@ -40,7 +41,11 @@ class MyRouter<TAggregate: Aggregate<TAggregate>>(system: ActorSystem, springExt
 
     private inline fun <reified TCommand: PlayCommand<TAggregate>> postCommand(aggregateId: AggregateId<TAggregate>): Route {
         return post {
-            entity<TCommand>(Jackson.unmarshaller(TCommand::class.java)) { command ->
+            val deserializer = Jackson.unmarshaller(TCommand::class.java)
+
+            val type = object : TypeReference<TCommand>() {}.type //todo: remove
+
+            entity<TCommand>(deserializer) { command ->
                 val cmdPosted = PatternsCS
                         .ask(myActor, AggregateMessages.ExecuteCommand(aggregateId, command), timeout)
                         .thenApply { obj -> obj as AggregateMessages.ActionPerformed }
