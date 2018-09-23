@@ -17,9 +17,4 @@ constructor(private val applicationContext: ApplicationContext, private val spri
         springAkkaExtension.setApplicationContext(applicationContext)
         return system
     }
-
-//    @Bean
-//    fun akkaConfiguration(): Config {
-//        return ConfigFactory.load()
-//    }
 }

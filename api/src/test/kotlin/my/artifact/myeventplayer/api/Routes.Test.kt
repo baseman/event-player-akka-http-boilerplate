@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner
 import com.fasterxml.jackson.databind.ObjectMapper
 
 
-
 @ContextConfiguration(
         classes = [(ApplicationConfig::class)],
         initializers = [(ApplicationInitializer::class)]
@@ -28,7 +27,7 @@ class RoutesTest : JUnitRouteTest() {
     lateinit var appServer: ApplicationServer
 
     @Before
-    fun beforeAll() {
+    fun initClass() {
         appServer.init()
     }
 

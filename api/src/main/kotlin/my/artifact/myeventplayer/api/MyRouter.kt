@@ -11,17 +11,17 @@ import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import akka.pattern.PatternsCS
 import akka.util.Timeout
-import co.remotectrl.eventplayer.Aggregate
 import co.remotectrl.eventplayer.AggregateId
-import co.remotectrl.eventplayer.PlayCommand
 import com.fasterxml.jackson.core.type.TypeReference
 import my.artifact.myeventplayer.api.actors.AggregateMessages
+import my.artifact.myeventplayer.common.aggregate.MyAggregate
+import my.artifact.myeventplayer.common.command.MyChangeCommand
 import org.springframework.stereotype.Component
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
 
 @Component
-class MyRouter<TAggregate: Aggregate<TAggregate>>(system: ActorSystem, springExtension: SpringExtension) : AllDirectives() {
+class MyRouter(system: ActorSystem, springExtension: SpringExtension) : AllDirectives() {
 
     private val myActor: ActorRef = system.actorOf(springExtension.props("myActor"))
 
@@ -33,19 +33,20 @@ class MyRouter<TAggregate: Aggregate<TAggregate>>(system: ActorSystem, springExt
         return route(pathPrefix("cmd") {
             route(
                     path<String>(PathMatchers.segment()) { aggregateId ->
-                        route(postCommand<PlayCommand<TAggregate>>(AggregateId(aggregateId.toInt())))
+                        route(postCommand<MyAggregate, MyChangeCommand>(AggregateId(aggregateId.toInt())))
                     }
             )
         })
     }
 
-    private inline fun <reified TCommand: PlayCommand<TAggregate>> postCommand(aggregateId: AggregateId<TAggregate>): Route {
+    private inline fun <TAggregate: MyAggregate, reified TCommand: MyChangeCommand> postCommand(aggregateId: AggregateId<MyAggregate>): Route {
         return post {
             val deserializer = Jackson.unmarshaller(TCommand::class.java)
 
             val type = object : TypeReference<TAggregate>() {}.type //todo: remove
+            val cmdType = object : TypeReference<TCommand>() {}.type //todo: remove
 
-            entity<TCommand>(deserializer) { command ->
+            entity(deserializer) { command ->
                 val cmdPosted = PatternsCS
                         .ask(myActor, AggregateMessages.ExecuteCommand(aggregateId, command), timeout)
                         .thenApply { obj -> obj as AggregateMessages.ActionPerformed }

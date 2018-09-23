@@ -4,7 +4,9 @@ import co.remotectrl.eventplayer.*
 import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import my.artifact.myeventplayer.common.event.MyChangedEvent
 
-class MyChangeCommand(var myChangeVal: String = "") : PlayCommand<MyAggregate> {
+class MyChangeCommand(var myChangeVal: String) : PlayCommand<MyAggregate> {
+
+    constructor() : this("")
 
     override fun validate(model: MyAggregate) {
         if(myChangeVal.isEmpty()){

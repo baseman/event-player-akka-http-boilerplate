@@ -34,7 +34,7 @@ junitPlatform {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     testCompile 'org.jetbrains.spek:spek-api:1.1.5'
     testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
@@ -43,12 +43,3 @@ dependencies {
     expectedBy project(':event-player')
     expectedBy project(':common')
 }
-
-//jar {
-//    manifest {}
-//
-//    // This line of code recursively collects and copies all of a project's files
-//    // and adds them to the JAR itself. One can extend this task, to skip certain
-//    // files or particular types at will
-//    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-//}

@@ -17,7 +17,7 @@ class ApplicationInitializer : ApplicationContextInitializer<GenericApplicationC
             bean("myActor") {
                 MyActor(ref())
             }
-            bean<MyRouter<MyAggregate>>()
+            bean<MyRouter>()
             bean<ApplicationServer>()
         }
     }
