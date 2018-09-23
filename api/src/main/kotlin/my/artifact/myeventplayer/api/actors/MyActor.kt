@@ -21,11 +21,11 @@ class MyActor(private val myService: MyService) : AbstractActor() {
     override fun createReceive(): Receive {
         return receiveBuilder()
                 .match(AggregateMessages.ExecuteCommand::class.java) {
+
                     myService.something(it.aggregateId, it.command)
-                    sender.tell(
-                            AggregateMessages.ActionPerformed(
-                                    "ok"
-                            ), self)
+
+                    sender.tell(AggregateMessages.ActionPerformed("ok"), self)
+
                 }
                 .matchAny {
                     log.info("received unknown message")
