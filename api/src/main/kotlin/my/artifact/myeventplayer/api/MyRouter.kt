@@ -12,7 +12,6 @@ import akka.http.javadsl.server.Route
 import akka.pattern.PatternsCS
 import akka.util.Timeout
 import co.remotectrl.eventplayer.AggregateId
-import com.fasterxml.jackson.core.type.TypeReference
 import my.artifact.myeventplayer.api.actors.AggregateMessages
 import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import my.artifact.myeventplayer.common.command.MyChangeCommand
@@ -33,18 +32,21 @@ class MyRouter(system: ActorSystem, springExtension: SpringExtension) : AllDirec
         return route(pathPrefix("cmd") {
             route(
                     path<String>(PathMatchers.segment()) { aggregateId ->
-                        route(postCommand<MyAggregate, MyChangeCommand>(AggregateId(aggregateId.toInt())))
+                        route(
+                                postCommand<MyAggregate, MyChangeCommand>(AggregateId(aggregateId.toInt())) //todo: can add additional routes here
+                        )
                     }
             )
         })
     }
 
+    //todo: see if reified types can be moved to class
     private inline fun <TAggregate: MyAggregate, reified TCommand: MyChangeCommand> postCommand(aggregateId: AggregateId<MyAggregate>): Route {
         return post {
             val deserializer = Jackson.unmarshaller(TCommand::class.java)
 
-            val type = object : TypeReference<TAggregate>() {}.type //todo: remove
-            val cmdType = object : TypeReference<TCommand>() {}.type //todo: remove
+//            val type = object : TypeReference<TAggregate>() {}.type //todo: remove
+//            val cmdType = object : TypeReference<TCommand>() {}.type //todo: remove
 
             entity(deserializer) { command ->
                 val cmdPosted = PatternsCS
