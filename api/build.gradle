@@ -14,6 +14,7 @@ buildscript {
   ext {
     kotlinVersion = '1.2.51'
     springBootVersion = '2.0.3.RELEASE'
+    akkaVersion = '10.1.4'
   }
   repositories {
     mavenCentral()
@@ -37,19 +38,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 
 sourceCompatibility = 1.8
 
-//compileKotlin {
-//  kotlinOptions {
-//    freeCompilerArgs = ["-Xjsr305=strict"]
-//    jvmTarget = "1.8"
-//  }
-//}
-//compileTestKotlin {
-//  kotlinOptions {
-//    freeCompilerArgs = ["-Xjsr305=strict"]
-//    jvmTarget = "1.8"
-//  }
-//}
-
 repositories {
   mavenCentral()
   maven { url "http://dl.bintray.com/jetbrains/spek" }
@@ -66,22 +54,25 @@ dependencies {
 
   compile("org.springframework.boot:spring-boot-starter")
 
-  compile('com.typesafe.akka:akka-http_2.12:10.1.4')
-  compile('com.typesafe.akka:akka-http-jackson_2.12:10.1.4')
-  compile('com.typesafe.akka:akka-stream_2.12:2.5.16')
+  compile("com.typesafe.akka:akka-http_2.12:${akkaVersion}")
+  compile("com.typesafe.akka:akka-http-jackson_2.12:${akkaVersion}")
+  compile("com.typesafe.akka:akka-stream_2.12:2.5.16")
 
-  expectedBy project(':event-player')
-  compile project(':jvm')
+  compile("com.github.swagger-akka-http:swagger-akka-http_2.12:2.0.0")
+  compile("io.swagger:swagger-jaxrs:1.5.18")
+  compile("ch.megard:akka-http-cors_2.12:0.3.0")
 
-  testCompile 'com.typesafe.akka:akka-http-testkit_2.12:10.1.4'
-  testCompile 'junit:junit:4.12'
+  expectedBy project(":event-player")
+  compile project(":jvm")
+
+  testCompile("com.typesafe.akka:akka-http-testkit_2.12:${akkaVersion}")
+  testCompile("junit:junit:4.12")
 
   testCompile("org.springframework.boot:spring-boot-starter-test:2.0.5.RELEASE")
   testRuntime("org.junit.vintage:junit-vintage-engine:5.3.1")
 
-//  testImplementation("org.junit.jupiter:junit-jupiter-api:5.1.0")
-//  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.0")
 }
+
 
 jar {
   manifest {}
