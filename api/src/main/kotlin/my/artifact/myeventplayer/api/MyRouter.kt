@@ -73,9 +73,9 @@ class MyRouter(system: ActorSystem, springExtension: SpringExtension) : AllDirec
         (ApiResponse(code = 404, message = "my item not found"))
     ])
     internal fun createCommandRoute(): Route {
-        return pathPrefix("cmd") {
+        return pathPrefix("my") {
 
-            path<String>(PathMatchers.segment()) { aggregateId ->
+            path<String>(PathMatchers.segment().slash("cmd")) { aggregateId ->
                 commandRouter.createPostCommand<MyChangeCommand>(AggregateId(aggregateId.toInt())) //todo: can add additional routes here
             }
         }

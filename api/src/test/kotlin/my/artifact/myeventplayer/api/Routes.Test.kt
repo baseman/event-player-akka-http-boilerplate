@@ -38,7 +38,7 @@ class RoutesTest : JUnitRouteTest() {
     fun execute() {
 
         testRoute(appServer.route).run(
-                HttpRequest.POST("/cmd/1").withEntity(
+                HttpRequest.POST("/my/1/cmd").withEntity(
                         MediaTypes.APPLICATION_JSON.toContentType(),
                         ObjectMapper().writeValueAsString(MyChangeCommand("blah"))
                         )
