@@ -5,36 +5,50 @@ import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import ch.megard.akka.http.cors.javadsl.CorsDirectives.cors
 import ch.megard.akka.http.cors.javadsl.settings.CorsSettings
-import com.fasterxml.jackson.core.JsonProcessingException
-import io.swagger.v3.core.util.Json
-import io.swagger.v3.jaxrs2.Reader
-import io.swagger.v3.oas.integration.SwaggerConfiguration
-import io.swagger.v3.oas.models.OpenAPI
+import com.github.swagger.akka.javadsl.Converter
+import com.github.swagger.akka.javadsl.SwaggerGenerator
+import io.swagger.models.Info
 
 
 class SwaggerDocRouter: AllDirectives() {
 
+    var generator: SwaggerGenerator = object : SwaggerGenerator {
+        override fun converter(): Converter {
+            return Converter(this)
+        }
+
+        override fun apiClasses(): Set<Class<*>> {
+            return setOf(MyRouter::class.java)
+        }
+
+        override fun info(): Info {
+            return Info()
+                    .title("My API")
+                    .description("Simple akka-http application")
+                    .version("1.0")
+        }
+    }
+
     fun createRoute(): Route {
-        val route = route(
+        val route =
                 path(PathMatchers.segment("api-docs").slash("swagger.json")) {
                     get {
-                        complete(swaggerJson())
+                        complete(generator.generateSwaggerJson())
                     }
-                })
-
+                }
 
         return cors(CorsSettings.defaultSettings()) { route }
     }
 
-    var readerConfig = SwaggerConfiguration()
-    private fun swaggerJson(): String {
-        try {
-            val reader = Reader(readerConfig.openAPI(OpenAPI()))
-            val swagger = reader.read(MyRouter::class.java)
-            return Json.pretty().writeValueAsString(swagger)
-        } catch (e: JsonProcessingException) {
-            throw RuntimeException(e)
-        }
-    }
+//    var readerConfig = SwaggerConfiguration()
+//    private fun swaggerJson(): String {
+//        try {
+//            val reader = Reader(readerConfig.openAPI(OpenAPI()))
+//            val swagger = reader.read(MyRouter::class.java)
+//            return Json.pretty().writeValueAsString(swagger)
+//        } catch (e: JsonProcessingException) {
+//            throw RuntimeException(e)
+//        }
+//    }
 
 }

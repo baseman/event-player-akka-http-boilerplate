@@ -4,7 +4,7 @@ import co.remotectrl.eventplayer.*
 import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import my.artifact.myeventplayer.common.event.MyChangedEvent
 
-class MyChangeCommand(var myChangeVal: String) : PlayCommand<MyAggregate> {
+open class MyChangeCommand(var myChangeVal: String) : PlayCommand<MyAggregate> {
 
     constructor() : this("")
 
