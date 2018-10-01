@@ -7,10 +7,6 @@ import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import akka.util.Timeout
 import co.remotectrl.eventplayer.AggregateId
-import co.remotectrl.eventplayer.PlayCommand
-import co.remotectrl.eventplayer.PlayEvent
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
 import io.swagger.annotations.*
 import my.artifact.myeventplayer.api.actors.AggregateMessages
 import my.artifact.myeventplayer.common.aggregate.MyAggregate
@@ -21,10 +17,6 @@ import java.util.concurrent.TimeUnit
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
-import com.fasterxml.jackson.databind.jsontype.TypeIdResolver
-import io.swagger.annotations.ApiModel
-
-
 
 
 @Path("/")
