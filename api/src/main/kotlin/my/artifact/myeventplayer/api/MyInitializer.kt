@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.support.GenericApplicationContext
 import org.springframework.context.support.beans
 
-class ApplicationInitializer : ApplicationContextInitializer<GenericApplicationContext> {
+class MyInitializer : ApplicationContextInitializer<GenericApplicationContext> {
 
     companion object BeansInitializer{
         fun get() = beans {

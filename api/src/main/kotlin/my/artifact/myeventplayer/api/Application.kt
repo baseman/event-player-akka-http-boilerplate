@@ -25,7 +25,7 @@ class MyApplication : ApplicationRunner{
 fun main(args: Array<String>) {
     try {
         runApplication<MyApplication>(*args) {
-            addInitializers(ApplicationInitializer())
+            addInitializers(MyInitializer())
         }
     }
     catch (e: Exception) {

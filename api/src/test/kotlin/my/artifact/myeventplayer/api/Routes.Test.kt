@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 
 @ContextConfiguration(
         classes = [(ApplicationConfig::class)],
-        initializers = [(ApplicationInitializer::class)]
+        initializers = [(MyInitializer::class)]
 )
 @RunWith(SpringRunner::class)
 @SpringBootTest

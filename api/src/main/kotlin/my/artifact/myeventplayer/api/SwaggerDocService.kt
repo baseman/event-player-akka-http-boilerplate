@@ -10,7 +10,7 @@ import com.github.swagger.akka.javadsl.SwaggerGenerator
 import io.swagger.models.Info
 
 
-class SwaggerDocRouter: AllDirectives() {
+class SwaggerDocRouter(apiClasses: Set<Class<*>>): AllDirectives() {
 
     var generator: SwaggerGenerator = object : SwaggerGenerator {
         override fun converter(): Converter {
@@ -18,7 +18,7 @@ class SwaggerDocRouter: AllDirectives() {
         }
 
         override fun apiClasses(): Set<Class<*>> {
-            return setOf(MyRouter::class.java)
+            return apiClasses
         }
 
         override fun info(): Info {

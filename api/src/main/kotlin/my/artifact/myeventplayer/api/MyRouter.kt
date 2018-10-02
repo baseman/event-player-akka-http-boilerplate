@@ -40,7 +40,7 @@ class MyRouter(system: ActorSystem, springExtension: SpringExtension) : AllDirec
         )
     }
 
-    private val swaggerDocRouter: SwaggerDocRouter = SwaggerDocRouter()
+    private val swaggerDocRouter: SwaggerDocRouter = SwaggerDocRouter(setOf(MyRouter::class.java))
     private fun createSwaggerRoute(): Route? {
         return route(
                 swaggerDocRouter.createRoute(),
