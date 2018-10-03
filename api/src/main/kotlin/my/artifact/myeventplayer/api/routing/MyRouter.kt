@@ -6,7 +6,6 @@ import akka.http.javadsl.server.AllDirectives
 import akka.http.javadsl.server.Route
 import akka.util.Timeout
 import io.swagger.models.Info
-import my.artifact.myeventplayer.api.SwaggerDocRouter
 import my.artifact.myeventplayer.api.spring.SpringExtension
 import org.springframework.stereotype.Component
 import scala.concurrent.duration.Duration

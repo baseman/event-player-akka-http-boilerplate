@@ -1,4 +1,4 @@
-package my.artifact.myeventplayer.api
+package my.artifact.myeventplayer.api.routing
 
 import akka.http.javadsl.server.AllDirectives
 import akka.http.javadsl.server.PathMatchers
@@ -8,7 +8,6 @@ import ch.megard.akka.http.cors.javadsl.settings.CorsSettings
 import com.github.swagger.akka.javadsl.Converter
 import com.github.swagger.akka.javadsl.SwaggerGenerator
 import io.swagger.models.Info
-
 
 class SwaggerDocRouter(apiClasses: Set<Class<*>>, apiInfo: Info): AllDirectives() {
 
