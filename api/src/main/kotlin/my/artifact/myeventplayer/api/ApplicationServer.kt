@@ -7,8 +7,7 @@ import akka.http.javadsl.ConnectHttp
 import akka.http.javadsl.Http
 import akka.http.javadsl.server.Route
 import akka.stream.ActorMaterializer
-import my.artifact.myeventplayer.common.aggregate.MyAggregate
-import org.slf4j.LoggerFactory
+import my.artifact.myeventplayer.api.routing.MyRouter
 import org.springframework.stereotype.Component
 
 @Component

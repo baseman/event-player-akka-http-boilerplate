@@ -1,4 +1,4 @@
-package my.artifact.myeventplayer.api
+package my.artifact.myeventplayer.api.spring
 
 import akka.actor.*
 import org.springframework.context.*

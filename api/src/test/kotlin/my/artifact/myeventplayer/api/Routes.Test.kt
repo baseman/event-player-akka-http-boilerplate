@@ -1,5 +1,6 @@
 package my.artifact.myeventplayer.api
 
+import akka.http.javadsl.model.HttpCharsets
 import akka.http.javadsl.model.HttpRequest
 import akka.http.javadsl.model.MediaTypes
 import akka.http.javadsl.model.StatusCodes
@@ -37,9 +38,10 @@ class RoutesTest : JUnitRouteTest() {
     @Test
     fun execute() {
 
+        val commandName = MyChangeCommand::class.java.name
         testRoute(appServer.route).run(
                 HttpRequest.POST("/my/1/cmd").withEntity(
-                        MediaTypes.APPLICATION_JSON.toContentType(),
+                        MediaTypes.applicationWithFixedCharset("vnd.$commandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
                         ObjectMapper().writeValueAsString(MyChangeCommand("blah"))
                         )
         ).assertStatusCode(StatusCodes.OK)

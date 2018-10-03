@@ -2,6 +2,7 @@ package my.artifact.myeventplayer.api
 
 import akka.actor.*
 import com.typesafe.config.*
+import my.artifact.myeventplayer.api.spring.SpringExtension
 import org.springframework.beans.factory.annotation.*
 import org.springframework.context.*
 import org.springframework.context.annotation.*

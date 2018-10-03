@@ -1,55 +1,31 @@
-package my.artifact.myeventplayer.api
+package my.artifact.myeventplayer.api.routing
 
-import akka.actor.ActorSystem
-import akka.event.Logging
+import akka.actor.ActorRef
 import akka.http.javadsl.server.AllDirectives
 import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import akka.util.Timeout
-import co.remotectrl.eventplayer.AggregateId
 import io.swagger.annotations.*
 import my.artifact.myeventplayer.api.actors.AggregateMessages
+import my.artifact.myeventplayer.api.directives.CommandRouteDirective
 import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import my.artifact.myeventplayer.common.command.MyChangeCommand
 import org.springframework.stereotype.Component
-import scala.concurrent.duration.Duration
-import java.util.concurrent.TimeUnit
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 
-
 @Path("/")
 @Api(value = "my", authorizations = [
-    Authorization(value="sampleoauth", scopes = [])
+    Authorization(value = "sampleoauth", scopes = [])
 ])
 @Produces("application/json")
 @Component
-class MyRouter(system: ActorSystem, springExtension: SpringExtension) : AllDirectives() {
-
-    private val commandRouter: CommandRouter<MyAggregate> = CommandRouter(
-            routeActor = system.actorOf(springExtension.props("myActor")),
-            timeout = Timeout(Duration.create(5, TimeUnit.SECONDS)),
-            log = Logging.getLogger(system, this)
-    )
-
-    internal fun createRoute(): Route {
-        return route(
-                createSwaggerRoute(),
-                createCommandRoute()
-        )
-    }
-
-    private val swaggerDocRouter: SwaggerDocRouter = SwaggerDocRouter(setOf(MyRouter::class.java))
-    private fun createSwaggerRoute(): Route? {
-        return route(
-                swaggerDocRouter.createRoute(),
-                path("swagger") {
-                    getFromResource("swagger/index.html")
-                },
-                getFromResourceDirectory("swagger")
-        )
-    }
+class MyCommandRouter(
+        val routeActor: ActorRef,
+        val timeout: Timeout,
+        private val commandHandler: CommandRouteDirective<MyAggregate> = CommandRouteDirective(routeActor, timeout)
+) : AllDirectives() {
 
     @POST
     @Path("/{aggregateId}/cmd")
@@ -64,14 +40,16 @@ class MyRouter(system: ActorSystem, springExtension: SpringExtension) : AllDirec
         (ApiResponse(code = 400, message = "invalid input")),
         (ApiResponse(code = 404, message = "my item not found"))
     ])
-    internal fun createCommandRoute(): Route {
+    internal fun createRoute(): Route {
         return pathPrefix("my") {
-
             path<String>(PathMatchers.segment().slash("cmd")) { aggregateId ->
-                commandRouter.createPostCommand<MyChangeCommand>(AggregateId(aggregateId.toInt())) //todo: can add additional routes here
+                post {
+                    route(
+                            commandHandler.commandExecute<MyChangeCommand>(aggregateId) //todo: can add additional routes here
+                    )
+                }
             }
         }
     }
 
 }
-
