@@ -27,6 +27,8 @@ class MyCommandRouter(
 
     private val commandHandler: CommandRouteDirective<MyAggregate> = CommandRouteDirective(routeActor, timeout)
 
+
+    //todo: list media types in swagger spec
     @POST
     @Path("/{aggregateId}/cmd")
     @Produces("application/json")

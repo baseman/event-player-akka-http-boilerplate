@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.After
+import java.time.Duration
 
 
 @ContextConfiguration(
@@ -28,8 +30,17 @@ class RoutesTest : JUnitRouteTest() {
     lateinit var appServer: ApplicationServer
 
     @Before
-    fun initClass() {
-        appServer.init()
+    fun before() {
+        appServer.bind()
+    }
+
+    @After
+    fun after() {
+        appServer.onShutdown { binding, _ ->
+            binding.terminate(
+                    Duration.ofSeconds(1)
+            )
+        }
     }
 
 //    @After

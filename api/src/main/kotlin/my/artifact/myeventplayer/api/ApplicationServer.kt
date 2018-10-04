@@ -5,6 +5,7 @@ import akka.event.Logging
 import akka.event.LoggingAdapter
 import akka.http.javadsl.ConnectHttp
 import akka.http.javadsl.Http
+import akka.http.javadsl.ServerBinding
 import akka.http.javadsl.server.Route
 import akka.stream.ActorMaterializer
 import my.artifact.myeventplayer.api.routing.MyRouter
@@ -13,31 +14,24 @@ import org.springframework.stereotype.Component
 @Component
 class ApplicationServer(val system: ActorSystem, router: MyRouter) {
 
-    val route: Route = router.createRoute()
-
     private val log: LoggingAdapter = Logging.getLogger(system, this)
+    private lateinit var binding: ServerBinding
 
-    fun init(){
+    val route = router.createRoute()
+
+    fun bind() {
+
         val http = Http.get(system)
         val materializer = ActorMaterializer.create(system)
-
         val flow = route.flow(system, materializer)
 
-        http.bindAndHandle(flow, ConnectHttp.toHost("localhost", 8080), materializer)
+        binding = http.bindAndHandle(flow, ConnectHttp.toHost("localhost", 8080), materializer).toCompletableFuture().get()
 
-        log.info("Server online at http://localhost:8080/")
+        this.log.info("Server online at http://localhost:8080/")
+    }
 
-
-        //todo: idenitfy graceful shutdown
-//        val binding =
-
-        //    fun cleanup(serverBinding: ServerBinding): CompletionStage<Any>{
-        //        return serverBinding.unbind() as CompletionStage<*>
-        //    }
-
-//        binding
-//                .thenCompose { it.unbind() }
-//                .thenAccept { system.terminate() }
+    fun onShutdown(fShutdown: (binding: ServerBinding, system: ActorSystem) -> Unit) {
+        fShutdown(binding, system)
     }
 
 }

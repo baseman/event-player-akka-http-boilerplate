@@ -1,24 +1,38 @@
 package my.artifact.myeventplayer.api
 
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import java.time.Duration
 
 @SpringBootApplication
 class MyApplication : ApplicationRunner{
-
-    private val log = LoggerFactory.getLogger(MyApplication::class.java)
 
     @Autowired
     private val appServer: ApplicationServer? = null
 
     override fun run(args: ApplicationArguments?) {
-        log.info("Your application started")
+        this.appServer?.let {
+            ApplicationGracefulShutdownHandler {
+                it.onShutdown { binding, system ->
+                    binding.terminate(
+                            Duration.ofSeconds(3)
+                    ).thenAccept { _ ->
 
-        this.appServer?.init()
+                        // hook for akka, will be used for any stops, not only by signals
+                        system.registerOnTermination {
+                            System.exit(0)
+                        }
+
+                        system.terminate()
+                    }
+                }
+            }
+
+            it.bind()
+        }
     }
 }
 
