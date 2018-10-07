@@ -11,6 +11,7 @@ import my.artifact.myeventplayer.api.directives.CommandRouteDirective
 import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import my.artifact.myeventplayer.common.command.MyChangeCommand
 import org.springframework.stereotype.Component
+import javax.ws.rs.Consumes
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
@@ -32,6 +33,9 @@ class MyCommandRouter(
     @POST
     @Path("/{aggregateId}/cmd")
     @Produces("application/json")
+    @Consumes(value = [
+        MyChangeCommand.mediaType
+    ])
     @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateMessages.ActionPerformed::class)
     @ApiImplicitParams(value = [
         (ApiImplicitParam(name = "aggregateId", value = "id for which command belongs to", required = true, paramType = "path", dataType = "integer")),

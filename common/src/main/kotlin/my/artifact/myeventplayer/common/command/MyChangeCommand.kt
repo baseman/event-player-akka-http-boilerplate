@@ -6,6 +6,10 @@ import my.artifact.myeventplayer.common.event.MyChangedEvent
 
 open class MyChangeCommand(var myChangeVal: String) : PlayCommand<MyAggregate> {
 
+    companion object {
+        const val mediaType = "vnd.my.artifact.myeventplayer.common.command.MyChangeCommand.api.v1+json"
+    }
+
     constructor() : this("")
 
     override fun validate(model: MyAggregate) {
