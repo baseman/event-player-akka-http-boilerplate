@@ -63,7 +63,7 @@ dependencies {
   compile("ch.megard:akka-http-cors_2.12:0.3.0")
 
   expectedBy project(":event-player")
-  compile project(":jvm")
+  compile project(":my-jvm")
 
   testCompile("com.typesafe.akka:akka-http-testkit_2.12:${akkaVersion}")
   testCompile("junit:junit:4.12")

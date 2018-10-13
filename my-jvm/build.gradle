@@ -41,5 +41,5 @@ dependencies {
     testCompile "org.amshove.kluent:kluent:1.24"
 
     expectedBy project(':event-player')
-    expectedBy project(':common')
+    expectedBy project(':my-common')
 }

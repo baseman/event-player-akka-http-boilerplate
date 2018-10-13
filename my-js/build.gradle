@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     expectedBy project(':event-player')
-    expectedBy project(':common')
+    expectedBy project(':my-common')
     compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
 }
 
