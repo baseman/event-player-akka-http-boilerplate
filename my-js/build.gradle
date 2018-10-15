@@ -25,6 +25,6 @@ dependencies {
 
 [compileKotlin2Js, compileTestKotlin2Js]*.configure {
     kotlinOptions.metaInfo = true
-    kotlinOptions.outputFile = "${projectDir}/build/js/myeventplayer.js"
+    kotlinOptions.outputFile = "${projectDir}/build/js/myEventPlayer.js"
     kotlinOptions.moduleKind = "commonjs"
 }
