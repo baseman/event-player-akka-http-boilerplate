@@ -13,16 +13,6 @@ class MyItemsListStore extends Component {
 
     sync = (fThenableGetItems) => {
 
-        //todo: move isOnline functionality outside
-        if (!dtoProxy.isOnline) {
-            this.setState((state) => ({
-                items: state.items,
-                isLoading: false,
-                err: null
-            }));
-            return;
-        }
-
         if (this.state.isLoading) {
             return;
         }

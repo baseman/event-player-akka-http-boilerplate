@@ -12,7 +12,7 @@ const MyTaskItem = (item, onCommandQueue) => {
             body: command
         }).then((response) => {
             if (response.status !== 200) {
-                throw Error("status [" + response.status + "] message: [" + response.status + "]");
+                throw Error("status [" + response.status + "] message: [" + response.statusText + "]");
             }
 
             return response.json()
