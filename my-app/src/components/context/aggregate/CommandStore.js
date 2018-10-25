@@ -64,8 +64,7 @@ class CommandStore extends Component {
                         items: this.state.items,
                         isPosting: this.state.isPosting,
                         err: this.state.err,
-                        onQueue: this.queue,
-                        onProcessNext: this.processNext,
+                        onQueue: this.queue
                         //todo: possible onSync -- save draft command? -- sync with commandProxy
                     }
                 }}>

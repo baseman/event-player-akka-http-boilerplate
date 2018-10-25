@@ -3,7 +3,7 @@ import React from 'react';
 const MyTaskItem = (item, onCommandQueue) => {
 
     function thenablePost(command) {
-        var postUrl = "**agregate**/" + command.aggregateId.val + "/cmd/" ;
+        const postUrl = "**agregate**/" + command.aggregateId.val + "/cmd/";
         return fetch(postUrl, {
             method: 'post',
             headers: {

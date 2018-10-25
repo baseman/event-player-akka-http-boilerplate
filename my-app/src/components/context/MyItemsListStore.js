@@ -7,7 +7,7 @@ const MyItemsListConsumer = MyItemsListContext.Consumer;
 class MyItemsListStore extends Component {
     state = {
         items: [],
-        isLoading: false, //todo: determine if this should be onloading?
+        isLoading: false,
         err: null
     };
 
