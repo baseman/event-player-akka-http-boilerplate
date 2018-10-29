@@ -3,9 +3,11 @@ import React from 'react';
 const MyTaskItem = (item, onCommandQueue) => {
 
     function thenablePost(command) {
+
+        //todo: wire-up example api
         const postUrl = "**agregate**/" + command.aggregateId.val + "/cmd/";
         return fetch(postUrl, {
-            method: 'post',
+            method: "post",
             headers: {
                 "Content-type": command.mediaType
             },

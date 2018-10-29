@@ -1,68 +1,59 @@
 import React from 'react';
 
-import {MyItemsListConsumer} from "./context/MyItemsListStore"
 import MyItem from "./MyItem";
 import MyTaskItem from "./MyTaskItem";
-import {CommandConsumer} from "./context/aggregate/CommandStore";
 
-function fThenableGetItems() {
-    const postUrl = "**agregate**/{userVal}";
-    return fetch(postUrl, {
-        method: 'get'
-    }).then((response) => {
-        if (response.status !== 200) {
-            throw Error("status [" + response.status + "] message: [" + response.statusText + "]");
-        }
+import {MyDtoConsumer} from "./context/aggregate/store/MyDtoStore"
+import {CommandConsumer} from "./context/aggregate/store/CommandStore";
 
-        return response.json()
-    })
-}
+import {MySyncProxy} from "./context/aggregate/proxy/MyDtoProxy"
 
 function MyAppConsumer({children}) {
-    return (
-        <CommandConsumer>
+    return (<CommandConsumer>
             {(command) => {
 
-                return <MyItemsListConsumer> {
-                    (my) => {
+                return <MyDtoConsumer> {
+                    (myDtoStore) => {
 
-                        //todo: needs initial call
-                        //todo: needs schedule
-                        //todo: **** my.onSync(fThenableGetItems);
+                        MySyncProxy.init({
+                            pollMilliseconds: 3000,
+                            onConnected: myDtoStore.onConnected,
+                            onDisconnected: myDtoStore.onDisconnected,
+                            onSync: myDtoStore.onSync,
+                            onError: myDtoStore.onError
+                        });
 
-                        children({my, command})
+                        children({myDtoStore, command})
                     }
                 }
-                </MyItemsListConsumer>
+                </MyDtoConsumer>
             }
-            }
-        </CommandConsumer>
-    )
+        }
+     </CommandConsumer>)
 }
 
-const MyItems = () => (
+const MyItems = ({ items, command })  => (
+    items.map(item =>
+        <div>
+            <MyItem item={item}/>
+            <MyTaskItem item={item} onTaskComplete={command.onQueue}/>
+        </div>
+    )
+);
+
+const MyDto = () => (
     <div className="Account-Items">
         <MyAppConsumer>
             {({my, command}) =>
-                my.items.map(item =>
-                    <div>
-
-                        {/*todo: my dto status*/}
-                        {/*todo: myDtoProxy.isOnline*/}
-                        {/*todo: my.isLoading*/}
-                        {/*todo: my.err*/}
-                        <MyItem item={item}/>
-
-                        {/*todo: command status*/}
-                        {/*todo: commandProxy.isOnline*/}
-                        {/*todo: command.isPosting*/}
-                        {/*todo: command.err*/}
-                        <MyTaskItem item={item} onTaskComplete={command.onQueue}/>
-                    </div>
-                )
+                <div>
+                    **{my.isOnline ? "Online" : "Offline"}**
+                    {/*todo: myDtoProxy.isRequesting*/}
+                    {my.err ? my.err.toString() : ""}
+                    <MyItems items={my.items} command={command}/>
+                </div>
             }
             </MyAppConsumer>
     </div>
 );
 
-export default MyItems;
+export default MyDto;
