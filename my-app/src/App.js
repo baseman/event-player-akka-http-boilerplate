@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import MyItems from "./components/MyItems";
+import MyItems from "./components/MyDto";
 import {CommandStore} from "./components/context/aggregate/store/CommandStore";
 import {MyDtoStore} from "./components/context/aggregate/store/MyDtoStore";
 

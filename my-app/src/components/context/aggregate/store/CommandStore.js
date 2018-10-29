@@ -8,63 +8,53 @@ class CommandStore extends Component {
     state = {
         //todo: possible create js map of commands per aggregateId to parallelize cmd exec
         items: [],
-        isPosting: false,
+        isProcessing: false,
         err: null
     };
 
-    processNext = (fThenablePost) => {
-
-        let items = this.state.items;
-
-        if (items.length === 0 || this.state.isPosting) {
-            return;
-        }
-
-        let _err = null;
-        this.setState((state) => ({
-            items: state.items,
-            isPosting: true,
-            err: _err
-        }));
-        return fThenablePost(items[0]).then((/*result*/) => {
-            items.shift(); //remove completed command from queue
-        }).catch((err) => {
-            _err = err
-        }).finally(() => {
-
-            //todo: *** replace with generator to drain refillable queue
-            this.setState((/*state*/) => ({
-                items: items,
-                isPosting: false,
-                err: _err
-            }));
-            if (items.length > 0){
-                this.processNext(fThenablePost);
-            }
-            //todo: ***
-
-        });
-    };
-
-    queue = (command, fThenablePost) => {
+    queue = (command) => {
         this.setState((state) => ({
             items: state.items.concat(command),
-            isPosting: state.isPosting,
+            isProcessing: state.isProcessing,
             err: state.err
         }));
+    };
 
-        this.processNext(fThenablePost)
+    processing = () => {
+        this.setState((state) => ({
+            items: state.items,
+            isProcessing: true,
+            err: null
+        }));
+    };
+
+    processed = (items) => {
+        this.setState((/*state*/) => ({
+            items: items,
+            isProcessing: false,
+            err: null
+        }));
+    };
+
+    error = (err) => {
+        this.setState((state) => ({
+            items: state.items,
+            isProcessing: false,
+            err: err
+        }));
     };
 
     render() {
-
         return (
                 <CommandContext.Provider value={{
                     command: {
                         items: this.state.items,
-                        isPosting: this.state.isPosting,
+                        isProcessing: this.state.isProcessing,
                         err: this.state.err,
-                        onQueue: this.queue
+                        onQueue: this.queue,
+                        onProcessing: this.processing,
+                        onProcessed: this.processed,
+                        onError: this.error
                         //todo: possible onSync -- save draft command? -- sync with commandProxy
                     }
                 }}>
