@@ -19,7 +19,7 @@ import javax.ws.rs.Produces
 @Path("/my")
 @Api(value = "my" /* ,authorizations = [Authorization(value = "sampleoauth", scopes = [])]*/)
 @Produces("application/json")
-class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDirectives(){
+class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDirectives() {
     @GET
     @Path("/{aggregateId}")
     @Produces("application/json")
@@ -70,5 +70,12 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
             })
 //            }
         }
+    }
+
+    fun createRoute(): Route {
+        return route(
+                getRoute(),
+                getForIdRoute()
+        )
     }
 }

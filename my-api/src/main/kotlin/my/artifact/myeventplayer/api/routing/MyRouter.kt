@@ -20,15 +20,27 @@ class MyRouter(
     val routeActor: ActorRef = system.actorOf(springExtension.props("myActor"))
     val timeout = Timeout(Duration.create(5, TimeUnit.SECONDS))
 
+    val cmdRouter = MyCommandRouter(routeActor, timeout)
+    val dtoRouter = MyDtoRouter(routeActor, timeout)
+
+
     internal fun createRoute(): Route {
         return route(
                 createSwaggerRoute(),
-                MyCommandRouter(routeActor, timeout).createRoute()
+                pathPrefix("my") {
+                    route(
+                            cmdRouter.createRoute(),
+                            dtoRouter.createRoute()
+                    )
+                }
         )
     }
 
     private val swaggerDocRouter: SwaggerDocRouter = SwaggerDocRouter(
-            apiClasses = setOf(MyCommandRouter::class.java),
+            apiClasses = setOf(
+                    MyCommandRouter::class.java,
+                    MyDtoRouter::class.java
+            ),
             apiInfo = Info()
                     .title("My API")
                     .description("Simple akka-http application")

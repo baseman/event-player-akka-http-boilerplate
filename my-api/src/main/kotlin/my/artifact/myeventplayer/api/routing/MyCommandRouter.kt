@@ -46,13 +46,11 @@ class MyCommandRouter(
         (ApiResponse(code = 404, message = "my item not found"))
     ])
     internal fun createRoute(): Route {
-        return pathPrefix("my") {
-            path<String>(PathMatchers.segment().slash("cmd")) { aggregateId ->
-                post {
-                    route(
-                            commandHandler.commandExecute<MyChangeCommand>(aggregateId) //todo: can add additional routes here
-                    )
-                }
+        return path<String>(PathMatchers.segment().slash("cmd")) { aggregateId ->
+            post {
+                route(
+                        commandHandler.commandExecute<MyChangeCommand>(aggregateId) //todo: can add additional routes here
+                )
             }
         }
     }
