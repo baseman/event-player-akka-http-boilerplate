@@ -30,7 +30,7 @@ function MyAppConsumer({children}) {
                             onError: my.onError
                         });
 
-                        children({my, command, commandProxy: commandProxy})
+                        children({my, command, commandProxy})
                     }
                 }
                 </MyDtoConsumer>
@@ -47,7 +47,7 @@ const MyDto = () => (
                     **{my.isOnline ? "Online" : "Offline"}**
                     {/*todo: myDtoProxy.isRequesting*/}
                     {my.err ? my.err.toString() : ""}
-                    <MyItems items={my.items} onCommandQueue={command}/>
+                    <MyItems items={my.items} onCommandQueue={commandProxy.queue}/>
                 </div>
             }
             </MyAppConsumer>

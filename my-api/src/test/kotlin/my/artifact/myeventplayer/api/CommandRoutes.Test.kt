@@ -24,7 +24,7 @@ import java.time.Duration
 )
 @RunWith(SpringRunner::class)
 @SpringBootTest
-class RoutesTest : JUnitRouteTest() {
+class CommandRoutesTest : JUnitRouteTest() {
 
     @Autowired
     lateinit var appServer: ApplicationServer

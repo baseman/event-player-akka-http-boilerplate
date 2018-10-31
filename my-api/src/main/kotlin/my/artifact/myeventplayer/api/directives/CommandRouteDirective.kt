@@ -10,7 +10,7 @@ import akka.util.Timeout
 import co.remotectrl.eventplayer.Aggregate
 import co.remotectrl.eventplayer.AggregateId
 import co.remotectrl.eventplayer.PlayCommand
-import my.artifact.myeventplayer.api.actors.AggregateMessages
+import my.artifact.myeventplayer.api.actors.AggregateCommandMessages
 
 class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: ActorRef, val timeout: Timeout) : RouteDirectives(){
 
@@ -18,12 +18,12 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
     inline fun <reified TCommand : PlayCommand<TAggregate>> commandExecute(aggregateId: String): Route = commandUnmarshaller.commandEntity<TCommand> { command ->
         val cmdPosted = PatternsCS.ask(
                 routeActor,
-                AggregateMessages.ExecuteCommand(AggregateId(aggregateId.toInt()), command),
+                AggregateCommandMessages.ExecuteCommand(AggregateId(aggregateId.toInt()), command),
                 timeout
-        ).thenApply { obj -> obj as AggregateMessages.ActionPerformed }
+        ).thenApply { obj -> obj as AggregateCommandMessages.ActionPerformed }
 
-        onSuccess<AggregateMessages.ActionPerformed>({ cmdPosted }, { performed ->
-            complete<AggregateMessages.ActionPerformed>(StatusCodes.OK, performed, Jackson.marshaller())
+        onSuccess<AggregateCommandMessages.ActionPerformed>({ cmdPosted }, { performed ->
+            complete<AggregateCommandMessages.ActionPerformed>(StatusCodes.OK, performed, Jackson.marshaller())
         })
     }
 }
