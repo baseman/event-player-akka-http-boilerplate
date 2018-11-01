@@ -58,17 +58,17 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
     ])
     fun getRoute(): Route? {
         return pathEnd {
-            //            get {
-            val returnItems = PatternsCS.ask(
-                    dtoActor,
-                    AggregateDtoMessages.GetItems(),
-                    timeout
-            ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItems<MyAggregate> }
+            get {
+                val returnItems = PatternsCS.ask(
+                        dtoActor,
+                        AggregateDtoMessages.GetItems(),
+                        timeout
+                ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItems<MyAggregate> }
 
-            onSuccess<AggregateDtoMessages.ReturnItems<MyAggregate>>({ returnItems }, { result ->
-                complete<AggregateDtoMessages.ReturnItems<MyAggregate>>(StatusCodes.OK, result, Jackson.marshaller())
-            })
-//            }
+                onSuccess<AggregateDtoMessages.ReturnItems<MyAggregate>>({ returnItems }, { result ->
+                    complete<AggregateDtoMessages.ReturnItems<MyAggregate>>(StatusCodes.OK, result, Jackson.marshaller())
+                })
+            }
         }
     }
 

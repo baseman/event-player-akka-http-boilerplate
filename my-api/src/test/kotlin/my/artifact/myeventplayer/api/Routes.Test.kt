@@ -46,9 +46,11 @@ class CommandRoutesTest : JUnitRouteTest() {
 //    @After
 //    fun afterAll() {}
 
-    @Test
-    fun execute() {
 
+    @Test
+    fun routes() {
+
+        //command
         val commandName = MyChangeCommand::class.java.name
         testRoute(appServer.route).run(
                 HttpRequest.POST("/my/1/cmd").withEntity(
@@ -56,5 +58,16 @@ class CommandRoutesTest : JUnitRouteTest() {
                         ObjectMapper().writeValueAsString(MyChangeCommand("blah"))
                         )
         ).assertStatusCode(StatusCodes.OK)
+
+        //dto
+        testRoute(appServer.route).run(
+                HttpRequest.GET("/my")
+        ).assertStatusCode(StatusCodes.OK)
+//                .assertEntity("x + y = 6.5")
+
+        testRoute(appServer.route).run(
+                HttpRequest.GET("/my/1")
+        ).assertStatusCode(StatusCodes.OK)
+////                .assertEntity("x + y = 6.5")
     }
 }
