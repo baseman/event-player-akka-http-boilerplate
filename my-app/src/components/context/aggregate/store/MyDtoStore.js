@@ -11,7 +11,7 @@ class MyDtoStore extends Component {
         err: null
     };
 
-    connect = () => {
+    connected = () => {
         if (this.state.isOnline) {
             return;
         }
@@ -23,10 +23,18 @@ class MyDtoStore extends Component {
         }));
     };
 
-    disconnect = () => {
+    disconnected = () => {
         this.setState((state) => ({
             items: state.items,
             isOnline: false,
+            err: null
+        }));
+    };
+
+    sync = (items) => {
+        this.setState((/*state*/) => ({
+            items: items,
+            isOnline: true,
             err: null
         }));
     };
@@ -39,27 +47,16 @@ class MyDtoStore extends Component {
         }));
     };
 
-    sync = (items) => {
-        this.setState((/*state*/) => ({
-            items: items,
-            isOnline: true,
-            err: null
-        }));
-    };
-
-    //todo: of AggregateContext.Provider
     render() {
         return (
             <MyDtoContext.Provider value={{
-                my: {
-                    items: this.state.items,
-                    isOnline: this.state.isOnline,
-                    err: this.state.err,
-                    onConnected: this.connect,
-                    onDisconnected: this.disconnect,
-                    onSync: this.sync,
-                    onError: this.error
-                }
+                items: this.state.items,
+                isOnline: this.state.isOnline,
+                err: this.state.err,
+                onConnected: this.connected,
+                onDisconnected: this.disconnected,
+                onSync: this.sync,
+                onError: this.error
             }}>
                 {this.props.children}
             </MyDtoContext.Provider>

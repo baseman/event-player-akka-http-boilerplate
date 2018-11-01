@@ -1,8 +1,7 @@
+import config from "../../../../config/poll.config";
 
 function thenablePost(command) {
-
-    //todo: wire-up example api
-    const postUrl = "**agregate**/" + command.aggregateId.val + "/cmd/";
+    const postUrl = config.host + "/" + command.aggregateId.val + "/cmd/";
     return fetch(postUrl, {
         method: "post",
         headers: {
@@ -15,8 +14,6 @@ function thenablePost(command) {
         }
 
         return response.json()
-    }).then((data) => {
-        //todo: apply to UI
     })
 }
 

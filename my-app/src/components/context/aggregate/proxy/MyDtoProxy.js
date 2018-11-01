@@ -1,8 +1,10 @@
+import config from "../../../../config/poll.config";
+
 let isRequesting = false;
 
 function thenableGetItems() {
 
-    const getUrl = "**agregate**/{userVal}"; //todo: create config http poll url
+    const getUrl = config.host + "/my/";
     return fetch(getUrl, {
         method: "get"
     }).then((response) => {
@@ -51,10 +53,10 @@ function initPoll(options) {
     options.onConnected()
 }
 
-const MySyncProxy = {
+const MyDtoProxy = {
     init: initPoll
     // syncItems: syncItems, //enable if you want to syncManually
-    //disconnect: tearDownPoll // enable if you want to disconnect manually
+    //disconnected: tearDownPoll // enable if you want to disconnected manually
 };
 
-export {MySyncProxy};
+export {MyDtoProxy};

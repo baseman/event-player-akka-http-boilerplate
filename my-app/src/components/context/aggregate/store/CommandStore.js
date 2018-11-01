@@ -46,20 +46,18 @@ class CommandStore extends Component {
 
     render() {
         return (
-                <CommandContext.Provider value={{
-                    command: {
-                        items: this.state.items,
-                        isProcessing: this.state.isProcessing,
-                        err: this.state.err,
-                        onQueue: this.queue,
-                        onProcessing: this.processing,
-                        onProcessed: this.processed,
-                        onError: this.error
-                        //todo: possible onSync -- save draft command? -- sync with commandProxy
-                    }
-                }}>
-                    {this.props.children}
-                </CommandContext.Provider>
+            <CommandContext.Provider value={{
+                items: this.state.items,
+                isProcessing: this.state.isProcessing,
+                err: this.state.err,
+                onQueue: this.queue,
+                onProcessing: this.processing,
+                onProcessed: this.processed,
+                onError: this.error
+                //todo: possible onSync -- save draft command? -- sync with commandProxy
+            }}>
+                {this.props.children}
+            </CommandContext.Provider>
         )
     }
 }

@@ -3,34 +3,34 @@ import React from 'react';
 import MyItems from "./MyItems";
 
 import {MyDtoConsumer} from "./context/aggregate/store/MyDtoStore"
-import {CommandConsumer} from "./context/aggregate/store/CommandStore";
 
-import {MySyncProxy} from "./context/aggregate/proxy/MyDtoProxy"
+import {MyDtoProxy} from "./context/aggregate/proxy/MyDtoProxy"
 import {CommandProxy} from "./context/aggregate/proxy/CommandProxy";
+import {CommandConsumer} from "./context/aggregate/store/CommandStore";
 
 function MyAppConsumer({children}) {
     return (<CommandConsumer>
-            {(command) => {
+            {commandStore => {
 
                 let commandProxy = CommandProxy.init({
-                    onQueue: command.onQueue,
-                    onProcessing: command.onProcessing,
-                    onProcessed: command.onProcessed,
-                    onError: command.onError
+                    onQueue: commandStore.onQueue,
+                    onProcessing: commandStore.onProcessing,
+                    onProcessed: commandStore.onProcessed,
+                    onError: commandStore.onError
                 });
 
-                return <MyDtoConsumer> {
-                    (my) => {
+                return <MyDtoConsumer>
+                    { myDtoStore => {
 
-                        MySyncProxy.init({
+                        MyDtoProxy.init({
                             pollMilliseconds: 3000,
-                            onConnected: my.onConnected,
-                            onDisconnected: my.onDisconnected,
-                            onSync: my.onSync,
-                            onError: my.onError
+                            onConnected: myDtoStore.onConnected,
+                            onDisconnected: myDtoStore.onDisconnected,
+                            onSync: myDtoStore.onSync,
+                            onError: myDtoStore.onError
                         });
 
-                        children({my, command, commandProxy})
+                        children({myDtoStore, commandStore, commandProxy})
                     }
                 }
                 </MyDtoConsumer>
@@ -40,14 +40,14 @@ function MyAppConsumer({children}) {
 }
 
 const MyDto = () => (
-    <div className="Account-Items">
+    <div className="My-Items">
         <MyAppConsumer>
-            {({my, command, commandProxy}) =>
+            {({myDtoStore}) =>
                 <div>
-                    **{my.isOnline ? "Online" : "Offline"}**
+                    **{myDtoStore.isOnline ? "Online" : "Offline"}**
                     {/*todo: myDtoProxy.isRequesting*/}
-                    {my.err ? my.err.toString() : ""}
-                    <MyItems items={my.items} onCommandQueue={commandProxy.queue}/>
+                    {myDtoStore.err ? myDtoStore.err.toString() : ""}
+                    <MyItems items={myDtoStore.items}/>
                 </div>
             }
             </MyAppConsumer>
