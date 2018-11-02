@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.After
 import java.time.Duration
 
-
 @ContextConfiguration(
         classes = [(ApplicationConfig::class)],
         initializers = [(MyInitializer::class)]
@@ -62,12 +61,14 @@ class CommandRoutesTest : JUnitRouteTest() {
         //dto
         testRoute(appServer.route).run(
                 HttpRequest.GET("/my")
-        ).assertStatusCode(StatusCodes.OK)
-//                .assertEntity("x + y = 6.5")
+        )
+                .assertStatusCode(StatusCodes.OK)
+                .assertEntity("{\"items\":[{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":1},\"myVal\":\"blah\"}]}")
 
         testRoute(appServer.route).run(
                 HttpRequest.GET("/my/1")
-        ).assertStatusCode(StatusCodes.OK)
-////                .assertEntity("x + y = 6.5")
+        )
+                .assertStatusCode(StatusCodes.OK)
+                .assertEntity("{\"item\":{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":1},\"myVal\":\"blah\"}}")
     }
 }
