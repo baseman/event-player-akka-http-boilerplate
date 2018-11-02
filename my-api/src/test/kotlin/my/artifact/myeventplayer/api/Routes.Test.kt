@@ -63,12 +63,16 @@ class CommandRoutesTest : JUnitRouteTest() {
                 HttpRequest.GET("/my")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("{\"items\":[{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":1},\"myVal\":\"blah\"}]}")
+                .assertEntity("[{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":1},\"myVal\":\"blah\"}]")
 
         testRoute(appServer.route).run(
                 HttpRequest.GET("/my/1")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("{\"item\":{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":1},\"myVal\":\"blah\"}}")
+                .assertEntity("{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":1},\"myVal\":\"blah\"}")
+
+        testRoute(appServer.route).run(
+                HttpRequest.GET("/my/2")
+        ).assertStatusCode(StatusCodes.NOT_FOUND)
     }
 }

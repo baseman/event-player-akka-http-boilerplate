@@ -33,19 +33,27 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
     ])
     fun getForIdRoute(): Route? {
 
-        return path<String>(PathMatchers.segment()) { aggregateId ->
-            //            get {
-            val returnItem = PatternsCS.ask(
-                    dtoActor,
-                    AggregateDtoMessages.GetItem<MyAggregate>(AggregateId(aggregateId.toInt())),
-                    timeout
-            ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItem<MyAggregate> }
+        return rejectEmptyResponse {
+            path<String>(PathMatchers.segment()) { aggregateId ->
+                //            get {
+                val returnItem = PatternsCS.ask(
+                        dtoActor,
+                        AggregateDtoMessages.GetItem<MyAggregate>(AggregateId(aggregateId.toInt())),
+                        timeout
+                ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItem<MyAggregate> }
 
-            onSuccess<AggregateDtoMessages.ReturnItem<MyAggregate>>({ returnItem }, { result ->
-                complete<AggregateDtoMessages.ReturnItem<MyAggregate>>(StatusCodes.OK, result, Jackson.marshaller())
-            })
+                onSuccess<AggregateDtoMessages.ReturnItem<MyAggregate>>({ returnItem }, { result ->
+                    if(result.item == null){
+                        complete("")
+                    }
+                    else{
+                        complete<MyAggregate>(StatusCodes.OK, result.item, Jackson.marshaller())
+                    }
+                })
 
 //            }
+            }
+
         }
     }
 
@@ -66,7 +74,7 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
                 ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItems<MyAggregate> }
 
                 onSuccess<AggregateDtoMessages.ReturnItems<MyAggregate>>({ returnItems }, { result ->
-                    complete<AggregateDtoMessages.ReturnItems<MyAggregate>>(StatusCodes.OK, result, Jackson.marshaller())
+                    complete<Array<MyAggregate>>(StatusCodes.OK, result.items, Jackson.marshaller())
                 })
             }
         }
