@@ -4,7 +4,7 @@ let isRequesting = false;
 
 function thenableGetItems() {
 
-    const getUrl = config.host + "/my/";
+    const getUrl = config.host + "/my";
     return fetch(getUrl, {
         method: "get"
     }).then((response) => {
@@ -46,9 +46,9 @@ function initPoll(options) {
 
     _options = options;
 
-    schedule = setTimeout(() => {
+    schedule = setInterval(() => {
         syncItems();
-    }, options.pollMilliseconds);
+    }, config.pollMilliseconds);
 
     options.onConnected()
 }

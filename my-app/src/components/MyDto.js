@@ -23,7 +23,6 @@ function MyAppConsumer({children}) {
                     { myDtoStore => {
 
                         MyDtoProxy.init({
-                            pollMilliseconds: 3000,
                             onConnected: myDtoStore.onConnected,
                             onDisconnected: myDtoStore.onDisconnected,
                             onSync: myDtoStore.onSync,
