@@ -1,0 +1,9 @@
+{
+  "name": "my",
+  "version": "1.0.0",
+  "main": "./build/commonjs/my.js",
+  "license": "MIT",
+  "dependencies": {
+    "kotlin": "^1.3.0"
+  }
+}

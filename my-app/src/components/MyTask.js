@@ -1,9 +1,14 @@
 import React from 'react';
 
+import My from 'my';
+
 const MyTask = ({item, onCommandQueue}) => {
 
     function onTaskComplete() {
-        let command = null; //todo: pull from kotlin definition
+        //todo: pull from kotlin definition
+        let command = null;
+
+        //todo: bind input params to command
         onCommandQueue(command)
     }
 

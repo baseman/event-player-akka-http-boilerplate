@@ -17,6 +17,8 @@ repositories {
     jcenter()
 }
 
+//todo: potential for webpack via https://github.com/Kotlin/kotlin-frontend-plugin#setup-npm-dependencies
+
 dependencies {
     expectedBy project(':event-player')
     expectedBy project(':my-common')
@@ -25,6 +27,6 @@ dependencies {
 
 [compileKotlin2Js, compileTestKotlin2Js]*.configure {
     kotlinOptions.metaInfo = true
-    kotlinOptions.outputFile = "${projectDir}/build/js/myEventPlayer.js"
+    kotlinOptions.outputFile = "${projectDir}/build/commonjs/my.js"
     kotlinOptions.moduleKind = "commonjs"
 }

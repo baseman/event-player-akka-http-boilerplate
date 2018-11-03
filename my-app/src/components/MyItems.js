@@ -10,7 +10,7 @@ const MyItems = ({ items, onCommandQueue })  => (
     items.map(item =>
         <div>
             <MyItem item={item}/>
-            {/*<MyTask item={item} onCommandQueue={onCommandQueue}/>*/}
+            <MyTask item={item} onCommandQueue={onCommandQueue}/>
         </div>
     )
 );
