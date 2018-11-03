@@ -6,6 +6,9 @@ const MyTask = ({item, onCommandQueue}) => {
 
     function onTaskComplete() {
         //todo: bind input params to command
+
+        //todo: can we simplify in my-js project with js friendly factory methods?
+        //todo: can we simplify package implementation with kotlin-js-frontend?
         let cmd = new My.my.artifact.myeventplayer.common.command.MyChangeCommand("blahChangeVal")
         onCommandQueue(cmd)
     }
