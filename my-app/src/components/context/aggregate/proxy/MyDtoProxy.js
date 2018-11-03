@@ -50,7 +50,9 @@ function initPoll(options) {
         syncItems();
     }, config.pollMilliseconds);
 
-    options.onConnected()
+    options.onConnected();
+
+    syncItems();
 }
 
 const MyDtoProxy = {

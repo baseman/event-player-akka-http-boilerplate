@@ -1,5 +1,6 @@
 import React from 'react';
 
+import MyTask from "./MyTask";
 import MyItems from "./MyItems";
 
 import {MyDtoConsumer} from "./context/aggregate/store/MyDtoStore"
@@ -29,7 +30,7 @@ function MyAppConsumer({children}) {
                             onError: myDtoStore.onError
                         });
 
-                        children({myDtoStore, commandStore, commandProxy})
+                        return children({myDtoStore, commandStore, commandProxy})
                     }
                 }
                 </MyDtoConsumer>
@@ -41,8 +42,10 @@ function MyAppConsumer({children}) {
 const MyDto = () => (
     <div className="My-Items">
         <MyAppConsumer>
-            {({myDtoStore, commandProxy}) =>
+            {({myDtoStore, commandStore, commandProxy}) =>
                 <div>
+                    <MyTask item={null} onCommandQueue={commandProxy.queue}/>
+
                     **{myDtoStore.isOnline ? "Online" : "Offline"}**
                     {/*todo: myDtoProxy.isRequesting*/}
                     {myDtoStore.err ? myDtoStore.err.toString() : ""}

@@ -42,10 +42,6 @@ class CommandRoutesTest : JUnitRouteTest() {
         }
     }
 
-//    @After
-//    fun afterAll() {}
-
-
     @Test
     fun routes() {
 

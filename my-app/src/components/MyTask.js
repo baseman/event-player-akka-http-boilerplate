@@ -5,15 +5,14 @@ import My from 'my';
 const MyTask = ({item, onCommandQueue}) => {
 
     function onTaskComplete() {
-        //todo: pull from kotlin definition
-        let command = null;
-
         //todo: bind input params to command
-        onCommandQueue(command)
+        let cmd = new My.my.artifact.myeventplayer.common.command.MyChangeCommand("blahChangeVal")
+        onCommandQueue(cmd)
     }
 
     return (<div className="Account-Task-Item">
-        {item.toString()}
+        <span>My Task</span>
+        {item ? item.toString() : "No Item"}
         <button onClick={onTaskComplete}>Execute</button>
     </div>)
 };
