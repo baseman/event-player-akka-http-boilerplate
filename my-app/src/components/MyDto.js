@@ -13,12 +13,7 @@ function MyAppConsumer({children}) {
     return (<CommandConsumer>
             {commandStore => {
 
-                let commandProxy = CommandProxy.init({
-                    onQueue: commandStore.onQueue,
-                    onProcessing: commandStore.onProcessing,
-                    onProcessed: commandStore.onProcessed,
-                    onError: commandStore.onError
-                });
+                CommandProxy.init(commandStore);
 
                 return <MyDtoConsumer>
                     { myDtoStore => {
@@ -30,7 +25,7 @@ function MyAppConsumer({children}) {
                             onError: myDtoStore.onError
                         });
 
-                        return children({myDtoStore, commandStore, commandProxy})
+                        return children({myDtoStore, commandStore})
                     }
                 }
                 </MyDtoConsumer>
@@ -42,15 +37,17 @@ function MyAppConsumer({children}) {
 const MyDto = () => (
     <div className="My-Items">
         <MyAppConsumer>
-            {({myDtoStore, commandStore, commandProxy}) =>
-                <div>
-                    <MyTask item={null} onCommandQueue={commandProxy.queue}/>
+            {({myDtoStore, commandStore}) =>{
+
+                return (<div>
+                    <MyTask item={null} onCommandQueue={commandStore.queue}/>
 
                     **{myDtoStore.isOnline ? "Online" : "Offline"}**
                     {/*todo: myDtoProxy.isRequesting*/}
                     {myDtoStore.err ? myDtoStore.err.toString() : ""}
-                    <MyItems items={myDtoStore.items} onCommandQueue={commandProxy.queue}/>
-                </div>
+                    <MyItems items={myDtoStore.items} onCommandQueue={commandStore.queue}/>
+                </div>)
+            }
             }
             </MyAppConsumer>
     </div>

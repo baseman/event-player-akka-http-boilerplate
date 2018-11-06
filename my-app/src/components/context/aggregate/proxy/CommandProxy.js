@@ -17,38 +17,15 @@ function thenablePost(command) {
     })
 }
 
-let isPosting = false;
-let processNext = (fThenablePost) => {
-
-    let items = this.state.items;
-
-    if (items.length === 0 || isPosting) {
-        return;
-    }
-
-    isPosting = true;
+let processNext = () => {
     _options.onProcessing();
-    return thenablePost(items[0]).then((/*result*/) => {
-        items.shift(); //remove completed command from queue
+    return thenablePost(_options.nextProcessItem).then((/*result*/) => {
+        _options.onProcessed();
     }).catch((err) => {
         _options.onError(err)
     }).finally(() => {
-
-        isPosting = false;
-
-        //todo: *** replace with generator to drain refillable queue
-        _options.onProcessed(items);
-        if (items.length > 0) {
-            processNext(fThenablePost);
-        }
-        //todo: ***
-
+        _options.onProcessed();
     });
-};
-
-let queue = (command, fThenablePost) => {
-    _options.onQueue(command);
-    processNext(fThenablePost)
 };
 
 let _options = null;
@@ -56,9 +33,12 @@ let _options = null;
 let CommandProxy = {
     init: (options) => {
         _options = options;
-        return {
-            queue: queue
+
+        if (_options.items !== 0 || _options.isProcessing) {
+            return;
         }
+
+        processNext();
     }
 };
 
