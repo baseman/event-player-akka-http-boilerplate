@@ -7,27 +7,35 @@ import org.springframework.stereotype.Service
 @Service
 class MyService {
 
+    fun commit(items: MutableList<MyAggregate>, cmd: PlayCommand<MyAggregate>) {
+
+        val index = items.size
+
+        items.add(
+                getMutable(
+                        aggregate = MyAggregate(legend = AggregateLegend(index, 0), myVal = ""),
+                        cmd = cmd
+                )
+        )
+    }
+
     fun commit(items: MutableList<MyAggregate>, aggregateId: AggregateId<MyAggregate>, cmd: PlayCommand<MyAggregate>) {
 
         val itemIndex = items.indexOfFirst {
             it.legend.aggregateId.value == aggregateId.value
         }
 
-        val index = if (itemIndex == -1) {
-            items.add(MyAggregate(legend = AggregateLegend(aggregateId, 0), myVal = ""))
-            items.size - 1
-        }
-        else {
-            itemIndex
-        }
+        items[itemIndex] = getMutable(
+                aggregate = items[itemIndex],
+                cmd = cmd
+        )
+    }
 
-        val aggregate = items[index]
-
+    private fun getMutable(aggregate: MyAggregate, cmd: PlayCommand<MyAggregate>): MyAggregate {
         val evt = cmd.executeOn(aggregate)
         val mutableAggregate = MutableAggregate(aggregate)
         evt.applyTo(mutableAggregate)
-
-        items[index] = mutableAggregate.model
+        return mutableAggregate.model
     }
 
     fun getAggregates(items: MutableList<MyAggregate>): Array<MyAggregate> {

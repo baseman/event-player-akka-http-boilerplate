@@ -3,6 +3,7 @@ package my.artifact.myeventplayer.api.directives
 import akka.actor.ActorRef
 import akka.http.javadsl.marshallers.jackson.Jackson
 import akka.http.javadsl.model.StatusCodes
+import akka.http.javadsl.server.ExceptionHandler
 import akka.http.javadsl.server.Route
 import akka.http.javadsl.server.directives.RouteDirectives
 import akka.pattern.PatternsCS
@@ -15,15 +16,48 @@ import my.artifact.myeventplayer.api.actors.AggregateCommandMessages
 class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: ActorRef, val timeout: Timeout) : RouteDirectives(){
 
     val commandUnmarshaller = CommandUnmarshallingDirective<TAggregate>()
-    inline fun <reified TCommand : PlayCommand<TAggregate>> commandExecute(aggregateId: String): Route = commandUnmarshaller.commandEntity<TCommand> { command ->
-        val cmdPosted = PatternsCS.ask(
-                routeActor,
-                AggregateCommandMessages.ExecuteCommand(AggregateId(aggregateId.toInt()), command),
-                timeout
-        ).thenApply { obj -> obj as AggregateCommandMessages.ActionPerformed }
 
-        onSuccess<AggregateCommandMessages.ActionPerformed>({ cmdPosted }, { performed ->
-            complete<AggregateCommandMessages.ActionPerformed>(StatusCodes.OK, performed, Jackson.marshaller())
-        })
+    val invalidInputHandler: ExceptionHandler = ExceptionHandler.newBuilder()
+            .match(IllegalArgumentException::class.java) { e ->
+                complete(StatusCodes.BAD_REQUEST, e.message)
+            }.build()
+
+    inline fun <reified TCommand : PlayCommand<TAggregate>> commandExecute(): Route = handleExceptions(invalidInputHandler) {
+
+        commandUnmarshaller.commandEntity<TCommand> { command ->
+            val cmdPosted = PatternsCS.ask(
+                    routeActor,
+                    AggregateCommandMessages.ExecuteCommand(command = command),
+                    timeout
+            ).thenApply { obj ->
+                if(obj is AggregateCommandMessages.ActionPerformed)
+                    obj
+                else
+                    throw (obj as AggregateCommandMessages.ArgumentError).error
+            }
+
+            onSuccess<AggregateCommandMessages.ActionPerformed>({ cmdPosted }, { performed ->
+                complete<AggregateCommandMessages.ActionPerformed>(StatusCodes.OK, performed, Jackson.marshaller())
+            })
+        }
+    }
+
+    inline fun <reified TCommand : PlayCommand<TAggregate>> commandExecute(aggregateId: String): Route = handleExceptions(invalidInputHandler) {
+        commandUnmarshaller.commandEntity<TCommand> { command ->
+            val cmdPosted = PatternsCS.ask(
+                    routeActor,
+                    AggregateCommandMessages.ExecuteCommandForAggregateId(AggregateId(aggregateId.toInt()), command),
+                    timeout
+            ).thenApply { obj ->
+                if(obj is AggregateCommandMessages.ActionPerformed)
+                    obj
+                else
+                    throw (obj as AggregateCommandMessages.ArgumentError).error
+            }
+
+            onSuccess<AggregateCommandMessages.ActionPerformed>({ cmdPosted }, { performed ->
+                complete<AggregateCommandMessages.ActionPerformed>(StatusCodes.OK, performed, Jackson.marshaller())
+            })
+        }
     }
 }

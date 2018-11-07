@@ -80,7 +80,7 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
         }
     }
 
-    fun createRoute(): Route {
+    fun dtoRoute(): Route {
         return route(
                 getRoute(),
                 getForIdRoute()

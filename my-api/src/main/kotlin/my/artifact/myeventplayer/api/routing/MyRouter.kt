@@ -23,14 +23,14 @@ class MyRouter(
     val cmdRouter = MyCommandRouter(routeActor, timeout)
     val dtoRouter = MyDtoRouter(routeActor, timeout)
 
-
     internal fun createRoute(): Route {
         return route(
                 createSwaggerRoute(),
                 pathPrefix("my") {
                     route(
-                            cmdRouter.createRoute(),
-                            dtoRouter.createRoute()
+                            cmdRouter.commandRoute(),
+                            cmdRouter.commandIdRoute(),
+                            dtoRouter.dtoRoute()
                     )
                 }
         )

@@ -10,6 +10,7 @@ import my.artifact.myeventplayer.api.actors.AggregateCommandMessages
 import my.artifact.myeventplayer.api.directives.CommandRouteDirective
 import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import my.artifact.myeventplayer.common.command.MyChangeCommand
+import my.artifact.myeventplayer.common.command.MyCreateCommand
 import javax.ws.rs.Consumes
 import javax.ws.rs.POST
 import javax.ws.rs.Path
@@ -27,8 +28,30 @@ class MyCommandRouter(
 
     private val commandHandler: CommandRouteDirective<MyAggregate> = CommandRouteDirective(routeActor, timeout)
 
+    @POST
+    @Path("/cmd")
+    @Produces("application/json")
+    @Consumes(value = [
+        MyCreateCommand.mediaType
+    ])
+    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformed::class)
+    @ApiImplicitParams(value = [
+        (ApiImplicitParam(name = "body", value = "command to execute", required = false, paramType = "body", dataType = "object"))
+    ])
+    @ApiResponses(value = [
+        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformed::class, message = "command successfully executed")),
+        (ApiResponse(code = 400, message = "invalid input"))
+    ])
+    internal fun commandRoute(): Route {
+        return pathPrefix("cmd") {
+            post {
+                route(
+                        commandHandler.commandExecute<MyCreateCommand>() //todo: can add additional routes here
+                )
+            }
+        }
+    }
 
-    //todo: list media types in swagger spec
     @POST
     @Path("/{aggregateId}/cmd")
     @Produces("application/json")
@@ -45,7 +68,7 @@ class MyCommandRouter(
         (ApiResponse(code = 400, message = "invalid input")),
         (ApiResponse(code = 404, message = "my item not found"))
     ])
-    internal fun createRoute(): Route {
+    internal fun commandIdRoute(): Route {
         return path<String>(PathMatchers.segment().slash("cmd")) { aggregateId ->
             post {
                 route(

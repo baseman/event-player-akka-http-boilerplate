@@ -40,12 +40,12 @@ const MyDto = () => (
             {({myDtoStore, commandStore}) =>{
 
                 return (<div>
-                    <MyTask item={null} onCommandQueue={commandStore.queue}/>
+                    <MyTask item={null} onCommandQueue={commandStore.onQueue}/>
 
                     **{myDtoStore.isOnline ? "Online" : "Offline"}**
                     {/*todo: myDtoProxy.isRequesting*/}
                     {myDtoStore.err ? myDtoStore.err.toString() : ""}
-                    <MyItems items={myDtoStore.items} onCommandQueue={commandStore.queue}/>
+                    <MyItems items={myDtoStore.items} onCommandQueue={commandStore.onQueue}/>
                 </div>)
             }
             }

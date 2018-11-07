@@ -20,6 +20,7 @@ class ApplicationGracefulShutdownHandler(val fShutdown: () -> Unit): SignalHandl
         Signal.handle(Signal(SIGINT), this)
     }
 
+    //todo: identify graceful shut down in debug
     override fun handle(signal: Signal?) {
 
         log.debug("handling request to onShutdown")

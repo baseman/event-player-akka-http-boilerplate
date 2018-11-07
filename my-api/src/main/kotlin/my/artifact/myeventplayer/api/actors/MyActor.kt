@@ -29,6 +29,16 @@ class MyActor(private val myService: MyService) : AbstractActor() {
 
                     myService.commit(
                             MyRepository.items,
+                            it.command as PlayCommand<MyAggregate>
+                    )
+
+                    sender.tell(AggregateCommandMessages.ActionPerformed("ok"), self)
+
+                }
+                .match(AggregateCommandMessages.ExecuteCommandForAggregateId::class.java) {
+
+                    myService.commit(
+                            MyRepository.items,
                             it.aggregateId as AggregateId<MyAggregate>,
                             it.command as PlayCommand<MyAggregate>
                     )
@@ -67,6 +77,8 @@ interface AggregateDtoMessages{
 }
 
 interface AggregateCommandMessages{
+    class ArgumentError(val error: IllegalArgumentException)
     class ActionPerformed(val description: String) : Serializable
-    class ExecuteCommand<TAggregate : Aggregate<TAggregate>, TCommand: PlayCommand<TAggregate>>(val aggregateId: AggregateId<TAggregate>, val command: TCommand)
+    class ExecuteCommand<TAggregate : Aggregate<TAggregate>, TCommand: PlayCommand<TAggregate>>(val command: TCommand)
+    class ExecuteCommandForAggregateId<TAggregate : Aggregate<TAggregate>, TCommand: PlayCommand<TAggregate>>(val aggregateId: AggregateId<TAggregate>, val command: TCommand)
 }

@@ -1,6 +1,9 @@
 import config from "../../../../config/poll.config";
 
 function thenablePost(command) {
+
+    //todo: create new aggregate from server -- identify ally project creation
+    //todo: replace command.aggregateId.val with aggregate.aggregateId.val
     const postUrl = config.host + "/" + command.aggregateId.val + "/cmd/";
     return fetch(postUrl, {
         method: "post",
@@ -34,7 +37,7 @@ let CommandProxy = {
     init: (options) => {
         _options = options;
 
-        if (_options.items !== 0 || _options.isProcessing) {
+        if (_options.items.length === 0 || _options.isProcessing) {
             return;
         }
 
