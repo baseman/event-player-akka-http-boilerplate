@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 import com.fasterxml.jackson.databind.ObjectMapper
+import my.artifact.myeventplayer.common.command.MyCreateCommand
 import org.junit.After
 import java.time.Duration
 
@@ -46,29 +47,60 @@ class CommandRoutesTest : JUnitRouteTest() {
     fun routes() {
 
         //command
-        val commandName = MyChangeCommand::class.java.name
+        val createCommandName = MyCreateCommand::class.java.name
         testRoute(appServer.route).run(
-                HttpRequest.POST("/my/1/cmd").withEntity(
-                        MediaTypes.applicationWithFixedCharset("vnd.$commandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
+                HttpRequest.POST("/my/cmd").withEntity(
+                        MediaTypes.applicationWithFixedCharset("vnd.$createCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
+                        ObjectMapper().writeValueAsString(MyCreateCommand("initial blah"))
+                )
+        ).assertStatusCode(StatusCodes.OK)
+
+        val changeCommandName = MyChangeCommand::class.java.name
+        testRoute(appServer.route).run(
+                HttpRequest.POST("/my/cmd/1").withEntity(
+                        MediaTypes.applicationWithFixedCharset("vnd.$changeCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
                         ObjectMapper().writeValueAsString(MyChangeCommand("blah"))
                         )
         ).assertStatusCode(StatusCodes.OK)
 
         //dto
         testRoute(appServer.route).run(
-                HttpRequest.GET("/my")
+                HttpRequest.GET("/my/items")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("[{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":1},\"myVal\":\"blah\"}]")
+                .assertEntity("[{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":2},\"myVal\":\"blah\"}]")
 
         testRoute(appServer.route).run(
-                HttpRequest.GET("/my/1")
+                HttpRequest.GET("/my/item/1")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":1},\"myVal\":\"blah\"}")
+                .assertEntity("{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":2},\"myVal\":\"blah\"}")
+
+        //error
+        testRoute(appServer.route).run(
+                HttpRequest.POST("/my/cmd/2").withEntity(
+                        MediaTypes.applicationWithFixedCharset("vnd.$changeCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
+                        ObjectMapper().writeValueAsString(MyChangeCommand("blah"))
+                )
+        ).assertStatusCode(StatusCodes.NOT_FOUND)
 
         testRoute(appServer.route).run(
-                HttpRequest.GET("/my/2")
+                HttpRequest.POST("/my/cmd").withEntity(
+                        MediaTypes.applicationWithFixedCharset("vnd.$createCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
+                        ""
+                )
+        ).assertStatusCode(StatusCodes.BAD_REQUEST)
+
+        testRoute(appServer.route).run(
+                HttpRequest.POST("/my/cmd/1").withEntity(
+                        MediaTypes.applicationWithFixedCharset("vnd.$changeCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
+                        ""
+                )
+        ).assertStatusCode(StatusCodes.BAD_REQUEST)
+
+
+        testRoute(appServer.route).run(
+                HttpRequest.GET("/my/item/2")
         ).assertStatusCode(StatusCodes.NOT_FOUND)
     }
 }

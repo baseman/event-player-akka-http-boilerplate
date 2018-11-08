@@ -30,14 +30,18 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
                     AggregateCommandMessages.ExecuteCommand(command = command),
                     timeout
             ).thenApply { obj ->
-                if(obj is AggregateCommandMessages.ActionPerformed)
-                    obj
-                else
-                    throw (obj as AggregateCommandMessages.ArgumentError).error
+                obj as AggregateCommandMessages.ActionPerformed
             }
 
             onSuccess<AggregateCommandMessages.ActionPerformed>({ cmdPosted }, { performed ->
-                complete<AggregateCommandMessages.ActionPerformed>(StatusCodes.OK, performed, Jackson.marshaller())
+
+                val statusCode = when {
+                    performed.commandErr != null -> StatusCodes.BAD_REQUEST
+                    else -> StatusCodes.OK
+                }
+
+                complete(statusCode)
+
             })
         }
     }
@@ -49,14 +53,17 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
                     AggregateCommandMessages.ExecuteCommandForAggregateId(AggregateId(aggregateId.toInt()), command),
                     timeout
             ).thenApply { obj ->
-                if(obj is AggregateCommandMessages.ActionPerformed)
-                    obj
-                else
-                    throw (obj as AggregateCommandMessages.ArgumentError).error
+                obj as AggregateCommandMessages.ActionPerformedForAggregateId
             }
 
-            onSuccess<AggregateCommandMessages.ActionPerformed>({ cmdPosted }, { performed ->
-                complete<AggregateCommandMessages.ActionPerformed>(StatusCodes.OK, performed, Jackson.marshaller())
+            onSuccess<AggregateCommandMessages.ActionPerformedForAggregateId>({ cmdPosted }, { performed ->
+                val statusCode = when {
+                    !performed.isAggregateFound -> StatusCodes.NOT_FOUND
+                    performed.commandErr != null -> StatusCodes.BAD_REQUEST
+                    else -> StatusCodes.OK
+                }
+
+                complete(statusCode)
             })
         }
     }

@@ -27,23 +27,47 @@ class MyActor(private val myService: MyService) : AbstractActor() {
         return receiveBuilder()
                 .match(AggregateCommandMessages.ExecuteCommand::class.java) {
 
-                    myService.commit(
-                            MyRepository.items,
-                            it.command as PlayCommand<MyAggregate>
-                    )
+                    try {
+                        myService.commit(
+                                MyRepository.items,
+                                it.command as PlayCommand<MyAggregate>
+                        )
 
-                    sender.tell(AggregateCommandMessages.ActionPerformed("ok"), self)
+                        sender.tell(AggregateCommandMessages.ActionPerformed(commandErr = null), self)
+
+                    } catch (e: Error){
+                        sender.tell(AggregateCommandMessages.ActionPerformed(commandErr = e.message), self)
+                    }
 
                 }
                 .match(AggregateCommandMessages.ExecuteCommandForAggregateId::class.java) {
 
-                    myService.commit(
-                            MyRepository.items,
-                            it.aggregateId as AggregateId<MyAggregate>,
-                            it.command as PlayCommand<MyAggregate>
-                    )
+                    val aggregate = myService.getAggregate(MyRepository.items, it.aggregateId as AggregateId<MyAggregate>)
 
-                    sender.tell(AggregateCommandMessages.ActionPerformed("ok"), self)
+                    when {
+                        aggregate != null -> try {
+                            myService.commit(
+                                    items = MyRepository.items,
+                                    aggregate = aggregate,
+                                    cmd = it.command as PlayCommand<MyAggregate>
+                            )
+
+                            sender.tell(AggregateCommandMessages.ActionPerformedForAggregateId(
+                                    isAggregateFound = true,
+                                    commandErr = null
+                            ), self)
+
+                        } catch (e: Error){
+                            sender.tell(AggregateCommandMessages.ActionPerformedForAggregateId(
+                                    isAggregateFound = true,
+                                    commandErr = e.message
+                            ), self)
+                        }
+                        else -> sender.tell(AggregateCommandMessages.ActionPerformedForAggregateId(
+                                isAggregateFound = false,
+                                commandErr = null
+                        ), self)
+                    }
 
                 }
                 .match(AggregateDtoMessages.GetItems::class.java) { getMsgs ->
@@ -77,8 +101,8 @@ interface AggregateDtoMessages{
 }
 
 interface AggregateCommandMessages{
-    class ArgumentError(val error: IllegalArgumentException)
-    class ActionPerformed(val description: String) : Serializable
+    class ActionPerformedForAggregateId(val isAggregateFound: Boolean, val commandErr: String?) : Serializable
     class ExecuteCommand<TAggregate : Aggregate<TAggregate>, TCommand: PlayCommand<TAggregate>>(val command: TCommand)
     class ExecuteCommandForAggregateId<TAggregate : Aggregate<TAggregate>, TCommand: PlayCommand<TAggregate>>(val aggregateId: AggregateId<TAggregate>, val command: TCommand)
+    class ActionPerformed(val commandErr: String?)
 }

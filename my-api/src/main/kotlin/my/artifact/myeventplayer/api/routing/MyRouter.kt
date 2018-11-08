@@ -28,9 +28,8 @@ class MyRouter(
                 createSwaggerRoute(),
                 pathPrefix("my") {
                     route(
-                            cmdRouter.commandRoute(),
-                            cmdRouter.commandIdRoute(),
-                            dtoRouter.dtoRoute()
+                            cmdRouter.commandRoutes(),
+                            dtoRouter.dtoRoutes()
                     )
                 }
         )

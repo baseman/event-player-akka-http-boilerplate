@@ -4,7 +4,7 @@ function thenablePost(command) {
 
     //todo: create new aggregate from server -- identify ally project creation
     //todo: replace command.aggregateId.val with aggregate.aggregateId.val
-    const postUrl = config.host + "/" + command.aggregateId.val + "/cmd/";
+    const postUrl = config.host + "/cmd/";
     return fetch(postUrl, {
         method: "post",
         headers: {

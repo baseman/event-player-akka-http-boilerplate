@@ -9,7 +9,7 @@ class MyService {
 
     fun commit(items: MutableList<MyAggregate>, cmd: PlayCommand<MyAggregate>) {
 
-        val index = items.size
+        val index = items.size + 1
 
         items.add(
                 getMutable(
@@ -19,14 +19,14 @@ class MyService {
         )
     }
 
-    fun commit(items: MutableList<MyAggregate>, aggregateId: AggregateId<MyAggregate>, cmd: PlayCommand<MyAggregate>) {
+    fun commit(items: MutableList<MyAggregate>, aggregate: MyAggregate, cmd: PlayCommand<MyAggregate>) {
 
         val itemIndex = items.indexOfFirst {
-            it.legend.aggregateId.value == aggregateId.value
+            it.legend.aggregateId.value == aggregate.legend.aggregateId.value
         }
 
         items[itemIndex] = getMutable(
-                aggregate = items[itemIndex],
+                aggregate = aggregate,
                 cmd = cmd
         )
     }

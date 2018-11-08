@@ -1,21 +1,25 @@
 package my.artifact.myeventplayer.common.command
 
-import co.remotectrl.eventplayer.AggregateId
-import co.remotectrl.eventplayer.PlayCommand
-import co.remotectrl.eventplayer.PlayEvent
+import co.remotectrl.eventplayer.*
 import my.artifact.myeventplayer.common.aggregate.MyAggregate
+import my.artifact.myeventplayer.common.event.MyCreatedEvent
 
-class MyCreateCommand : PlayCommand<MyAggregate> {
+data class MyCreateCommand(val myInitialVal: String) : PlayCommand<MyAggregate> {
 
     companion object {
         const val mediaType = "vnd.my.artifact.myeventplayer.common.command.MyCreateCommand.api.v1+json"
     }
 
+    constructor() : this("")
+
     override fun validate(model: MyAggregate) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if(myInitialVal.isEmpty()){
+            throw Exception("Invalid commit input")
+        }
     }
 
     override fun getEvent(aggregateId: AggregateId<MyAggregate>, version: Int): PlayEvent<MyAggregate> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //todo: generate unique id
+        return MyCreatedEvent(EventLegend(EventId(0), aggregateId, version), myInitialVal)
     }
 }

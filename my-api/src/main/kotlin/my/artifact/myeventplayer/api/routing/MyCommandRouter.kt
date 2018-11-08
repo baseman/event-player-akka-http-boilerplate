@@ -28,22 +28,31 @@ class MyCommandRouter(
 
     private val commandHandler: CommandRouteDirective<MyAggregate> = CommandRouteDirective(routeActor, timeout)
 
+    internal fun commandRoutes(): Route {
+        return pathPrefix("cmd") {
+            route(
+                    commandRoute(),
+                    commandIdRoute()
+            )
+        }
+    }
+
     @POST
     @Path("/cmd")
     @Produces("application/json")
     @Consumes(value = [
         MyCreateCommand.mediaType
     ])
-    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformed::class)
+    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformedForAggregateId::class)
     @ApiImplicitParams(value = [
         (ApiImplicitParam(name = "body", value = "command to execute", required = false, paramType = "body", dataType = "object"))
     ])
     @ApiResponses(value = [
-        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformed::class, message = "command successfully executed")),
+        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformedForAggregateId::class, message = "command successfully executed")),
         (ApiResponse(code = 400, message = "invalid input"))
     ])
     internal fun commandRoute(): Route {
-        return pathPrefix("cmd") {
+        return pathEnd{
             post {
                 route(
                         commandHandler.commandExecute<MyCreateCommand>() //todo: can add additional routes here
@@ -53,27 +62,29 @@ class MyCommandRouter(
     }
 
     @POST
-    @Path("/{aggregateId}/cmd")
+    @Path("/cmd/{aggregateId}")
     @Produces("application/json")
     @Consumes(value = [
         MyChangeCommand.mediaType
     ])
-    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformed::class)
+    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformedForAggregateId::class)
     @ApiImplicitParams(value = [
         (ApiImplicitParam(name = "aggregateId", value = "id for which command belongs to", required = true, paramType = "path", dataType = "integer")),
         (ApiImplicitParam(name = "body", value = "command to execute", required = false, paramType = "body", dataType = "object"))
     ])
     @ApiResponses(value = [
-        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformed::class, message = "command successfully executed")),
+        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformedForAggregateId::class, message = "command successfully executed")),
         (ApiResponse(code = 400, message = "invalid input")),
         (ApiResponse(code = 404, message = "my item not found"))
     ])
     internal fun commandIdRoute(): Route {
-        return path<String>(PathMatchers.segment().slash("cmd")) { aggregateId ->
-            post {
-                route(
-                        commandHandler.commandExecute<MyChangeCommand>(aggregateId) //todo: can add additional routes here
-                )
+        return rejectEmptyResponse {
+            path<String>(PathMatchers.segment()) { aggregateId ->
+                post {
+                    route(
+                            commandHandler.commandExecute<MyChangeCommand>(aggregateId) //todo: can add additional routes here
+                    )
+                }
             }
         }
     }

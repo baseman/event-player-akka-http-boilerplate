@@ -21,7 +21,7 @@ import javax.ws.rs.Produces
 @Produces("application/json")
 class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDirectives() {
     @GET
-    @Path("/{aggregateId}")
+    @Path("/item/{aggregateId}")
     @Produces("application/json")
     @ApiOperation(value = "get item by id", code = 200, nickname = "execute")
     @ApiImplicitParams(value = [
@@ -34,38 +34,39 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
     fun getForIdRoute(): Route? {
 
         return rejectEmptyResponse {
-            path<String>(PathMatchers.segment()) { aggregateId ->
-                //            get {
-                val returnItem = PatternsCS.ask(
-                        dtoActor,
-                        AggregateDtoMessages.GetItem<MyAggregate>(AggregateId(aggregateId.toInt())),
-                        timeout
-                ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItem<MyAggregate> }
+        pathPrefix("item") {
 
-                onSuccess<AggregateDtoMessages.ReturnItem<MyAggregate>>({ returnItem }, { result ->
-                    if(result.item == null){
-                        complete("")
-                    }
-                    else{
-                        complete<MyAggregate>(StatusCodes.OK, result.item, Jackson.marshaller())
-                    }
-                })
+                path<String>(PathMatchers.segment()) { aggregateId ->
+                    //            get {
+                    val returnItem = PatternsCS.ask(
+                            dtoActor,
+                            AggregateDtoMessages.GetItem<MyAggregate>(AggregateId(aggregateId.toInt())),
+                            timeout
+                    ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItem<MyAggregate> }
+
+                    onSuccess<AggregateDtoMessages.ReturnItem<MyAggregate>>({ returnItem }, { result ->
+                        when {
+                            result.item == null -> complete("")
+                            else -> complete<MyAggregate>(StatusCodes.OK, result.item, Jackson.marshaller())
+                        }
+                    })
 
 //            }
-            }
+                }
 
+            }
         }
     }
 
     @GET
-    @Path("/")
+    @Path("/items")
     @Produces("application/json")
     @ApiOperation(value = "get all items", code = 200, nickname = "execute")
     @ApiResponses(value = [
         (ApiResponse(code = 200, response = Array<MyAggregate>::class, message = "item list results"))
     ])
     fun getRoute(): Route? {
-        return pathEnd {
+        return pathPrefix("items") {
             get {
                 val returnItems = PatternsCS.ask(
                         dtoActor,
@@ -80,7 +81,7 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
         }
     }
 
-    fun dtoRoute(): Route {
+    fun dtoRoutes(): Route {
         return route(
                 getRoute(),
                 getForIdRoute()
