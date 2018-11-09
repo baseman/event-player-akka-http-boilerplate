@@ -20,7 +20,7 @@ class CommandUnmarshallingDirective<TAggregate : Aggregate<TAggregate>> : Marsha
     ): Route = entity(getCommandUnmarshaller(), inner)
 
     fun <TCommand> mediaType(valueType: Class<TCommand>): MediaType {
-        return MediaTypes.applicationWithFixedCharset("vnd.${valueType.name}.api.v1+json", HttpCharsets.UTF_8)
+        return MediaTypes.applicationWithFixedCharset("vnd.${valueType.name.toLowerCase()}.api.v1+json", HttpCharsets.UTF_8)
     }
 
     inline fun <reified TCommand> getCommandUnmarshaller(): Unmarshaller<HttpEntity, TCommand> {

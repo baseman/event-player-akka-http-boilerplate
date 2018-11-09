@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import My from 'my';
+const MyCreateCommand = My.my.artifact.myeventplayer.common.command.MyCreateCommand;
 
 class MyTask extends Component{
 
@@ -8,7 +9,7 @@ class MyTask extends Component{
         //todo: can we simplify in my-js project with js friendly factory methods?
         //todo: can we simplify package implementation with kotlin-js-frontend?
 
-        let cmd = new My.my.artifact.myeventplayer.common.command.MyChangeCommand(this.myChangeInput.value);
+        let cmd = new MyCreateCommand(this.myChangeInput.value);
         this.props.onCommandQueue(cmd)
     };
 

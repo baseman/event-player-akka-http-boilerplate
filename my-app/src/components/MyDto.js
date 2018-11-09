@@ -1,6 +1,6 @@
 import React from 'react';
 
-import MyTask from "./MyTask";
+import MyTask from "./tasks/MyTask";
 import MyItems from "./MyItems";
 
 import {MyDtoConsumer} from "./context/aggregate/store/MyDtoStore"

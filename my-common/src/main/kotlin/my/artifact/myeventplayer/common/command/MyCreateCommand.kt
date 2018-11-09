@@ -7,7 +7,7 @@ import my.artifact.myeventplayer.common.event.MyCreatedEvent
 data class MyCreateCommand(val myInitialVal: String) : PlayCommand<MyAggregate> {
 
     companion object {
-        const val mediaType = "vnd.my.artifact.myeventplayer.common.command.MyCreateCommand.api.v1+json"
+        const val mediaType = "application/vnd.my.artifact.myeventplayer.common.command.MyCreateCommand.api.v1+json"
     }
 
     constructor() : this("")

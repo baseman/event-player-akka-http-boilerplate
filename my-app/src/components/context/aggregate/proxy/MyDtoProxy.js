@@ -4,7 +4,7 @@ let isRequesting = false;
 
 function thenableGetItems() {
 
-    const getUrl = config.host + "/my";
+    const getUrl = config.host + "/my/items";
     return fetch(getUrl, {
         method: "get"
     }).then((response) => {

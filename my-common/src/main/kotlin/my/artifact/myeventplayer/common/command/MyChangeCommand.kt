@@ -7,7 +7,7 @@ import my.artifact.myeventplayer.common.event.MyChangedEvent
 data class MyChangeCommand(var myChangeVal: String) : PlayCommand<MyAggregate> {
 
     companion object {
-        const val mediaType = "vnd.my.artifact.myeventplayer.common.command.MyChangeCommand.api.v1+json"
+        const val mediaType = "application/vnd.my.artifact.myeventplayer.common.command.MyChangeCommand.api.v1+json"
     }
 
     constructor() : this("")
