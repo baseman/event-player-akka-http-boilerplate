@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import My from 'my';
+
 const MyCreateCommand = My.my.artifact.myeventplayer.common.command.MyCreateCommand;
 
 class MyTask extends Component{
@@ -13,9 +14,6 @@ class MyTask extends Component{
         this.props.onCommandQueue(cmd)
     };
 
-    //({item, onCommandQueue})
-
-
     render(){
         return (<div className="Account-Task-Item">
             <span>My Task</span>
@@ -24,6 +22,6 @@ class MyTask extends Component{
             <button onClick={this.onTaskComplete}>Execute</button>
         </div>)
     }
-};
+}
 
 export default MyTask;

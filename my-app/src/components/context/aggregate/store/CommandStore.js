@@ -8,6 +8,7 @@ class CommandStore extends Component {
     state = {
         //todo: possible create js map of commands per aggregateId to parallelize cmd exec
         items: [],
+        deadLetterItems: [],
         isProcessing: false,
         err: null
     };
@@ -15,14 +16,16 @@ class CommandStore extends Component {
     queue = (command) => {
         this.setState((state) => ({
             items: state.items.concat(command), //add items to end of queue
+            deadLetterItems: state.deadLetterItems,
             isProcessing: state.isProcessing,
-            err: state.err
+            err: null
         }));
     };
 
     processing = () => {
         this.setState((state) => ({
             items: state.items,
+            deadLetterItems: state.deadLetterItems,
             isProcessing: true,
             err: null
         }));
@@ -34,18 +37,58 @@ class CommandStore extends Component {
 
             return ({
                 items: state.items,
+                deadLetterItems: state.deadLetterItems,
                 isProcessing: false,
                 err: null
             })
         })
     };
 
-    error = (err) => {
-        this.setState((state) => ({
-            items: state.items,
-            isProcessing: false,
-            err: err
-        }));
+    error = (err, command) => {
+        this.setState((state) => {
+
+            return {
+                items: state.items.filter(item => item !== command),
+                deadLetterItems: state.deadLetterItems.concat({err: err, command: command}), //queue error and dead letter item
+                isProcessing: false,
+                err: err
+            }
+        });
+    };
+
+    // todo: retry = (command) => {
+    //     this.setState((state) => {
+    //
+    //         let retryIndex = 0;
+    //         let deadLetterItems = [];
+    //         for(let i =0; i < state.deadLetterItems.length; i++){
+    //             if(state.deadLetterItems.command !== command){
+    //                 deadLetterItems.push(state.deadLetterItems[i])
+    //             }
+    //             else{
+    //                 retryIndex = i;
+    //             }
+    //         }
+    //
+    //         return {
+    //             items: state.items.concat(state.deadLetterItems[retryIndex].command),
+    //             deadLetterItems: deadLetterItems,
+    //             isProcessing: false,
+    //             err: null
+    //         }
+    //     });
+    // };
+
+    removeDeadLetter = (command) => {
+        this.setState((state) => {
+
+            return {
+                items: state.items,
+                deadLetterItems: state.deadLetterItems.filter((item) => item !== command),
+                isProcessing: false,
+                err: null
+            }
+        });
     };
 
     render() {
@@ -53,12 +96,15 @@ class CommandStore extends Component {
             <CommandContext.Provider value={{
                 items: this.state.items,
                 nextProcessItem: this.state.items[0],
+                deadLetterItems: this.state.deadLetterItems,
                 isProcessing: this.state.isProcessing,
                 err: this.state.err,
                 onQueue: this.queue,
                 onProcessing: this.processing,
                 onProcessed: this.processed,
-                onError: this.error
+                onError: this.error,
+                // onRetry: this.retry,
+                onRemoveDeadLetter: this.removeDeadLetter,
                 //todo: possible onSync -- save draft command? -- sync with commandProxy
             }}>
                 {this.props.children}

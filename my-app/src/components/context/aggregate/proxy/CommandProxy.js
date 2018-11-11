@@ -20,13 +20,12 @@ function thenablePost(command) {
 
 let processNext = () => {
     _options.onProcessing();
+    let processItem = _options.nextProcessItem;
     return thenablePost(_options.nextProcessItem).then((/*result*/) => {
         _options.onProcessed();
     }).catch((err) => {
-        _options.onError(err)
-    }).finally(() => {
-        _options.onProcessed();
-    }); //todo: determine if we need a dead letter queue
+        _options.onError(err, processItem)
+    })
 };
 
 let _options = null;
