@@ -43,12 +43,12 @@ class MyCommandRouter(
     @Consumes(value = [
         MyCreateCommand.mediaType
     ])
-    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformedForAggregateId::class)
+    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformed::class)
     @ApiImplicitParams(value = [
         (ApiImplicitParam(name = "body", value = "command to execute", required = false, paramType = "body", dataType = "object"))
     ])
     @ApiResponses(value = [
-        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformedForAggregateId::class, message = "command successfully executed")),
+        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformed::class, message = "command successfully executed")),
         (ApiResponse(code = 400, message = "invalid input"))
     ])
     internal fun commandRoute(): Route {

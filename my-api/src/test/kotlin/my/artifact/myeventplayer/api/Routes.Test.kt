@@ -24,7 +24,7 @@ import java.time.Duration
 )
 @RunWith(SpringRunner::class)
 @SpringBootTest
-class CommandRoutesTest : JUnitRouteTest() {
+class RouteTest : JUnitRouteTest() {
 
     @Autowired
     lateinit var appServer: ApplicationServer
@@ -76,6 +76,8 @@ class CommandRoutesTest : JUnitRouteTest() {
                 .assertStatusCode(StatusCodes.OK)
                 .assertEntity("{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":2},\"myVal\":\"blah\"}")
 
+
+        //todo: generic errors is likely a sign which testing a library maybe more suitable that testing at the api level -- identify if this is possible
         //error
         testRoute(appServer.route).run(
                 HttpRequest.POST("/my/cmd/2").withEntity(
