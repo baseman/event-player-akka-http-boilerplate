@@ -14,7 +14,7 @@ data class MyChangeCommand(var myChangeVal: String) : PlayCommand<MyAggregate> {
 
     override fun validate(model: MyAggregate) {
         if(myChangeVal.isEmpty()){
-            throw Exception("Invalid commit input")
+            throw IllegalStateException("Invalid commit input")
         }
     }
 

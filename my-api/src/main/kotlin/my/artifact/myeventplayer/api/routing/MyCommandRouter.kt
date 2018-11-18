@@ -52,10 +52,10 @@ class MyCommandRouter(
         (ApiResponse(code = 400, message = "invalid input"))
     ])
     internal fun commandRoute(): Route {
-        return pathEnd{
+        return pathEnd {
             post {
                 route(
-                        commandHandler.commandExecute<MyCreateCommand>() //todo: can add additional routes here
+                        commandHandler.commandExecute<MyCreateCommand>(MyAggregate()) //todo: can add additional routes here
                 )
             }
         }
@@ -67,26 +67,26 @@ class MyCommandRouter(
     @Consumes(value = [
         MyChangeCommand.mediaType
     ])
-    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformedForAggregateId::class)
+    @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = AggregateCommandMessages.ActionPerformed::class)
     @ApiImplicitParams(value = [
         (ApiImplicitParam(name = "aggregateId", value = "id for which command belongs to", required = true, paramType = "path", dataType = "integer")),
         (ApiImplicitParam(name = "body", value = "command to execute", required = false, paramType = "body", dataType = "object"))
     ])
     @ApiResponses(value = [
-        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformedForAggregateId::class, message = "command successfully executed")),
+        (ApiResponse(code = 200, response = AggregateCommandMessages.ActionPerformed::class, message = "command successfully executed")),
         (ApiResponse(code = 400, message = "invalid input")),
         (ApiResponse(code = 404, message = "my item not found"))
     ])
     internal fun commandIdRoute(): Route {
-        return rejectEmptyResponse {
-            path<String>(PathMatchers.segment()) { aggregateId ->
-                post {
-                    route(
-                            commandHandler.commandExecute<MyChangeCommand>(aggregateId) //todo: can add additional routes here
-                    )
+        return route(
+                path<String>(PathMatchers.segment()) { aggregateId ->
+                    post {
+                        route(
+                                commandHandler.commandExecute<MyChangeCommand>(aggregateId) //todo: can add additional routes here
+                        )
+                    }
                 }
-            }
-        }
+        )
     }
 
 }

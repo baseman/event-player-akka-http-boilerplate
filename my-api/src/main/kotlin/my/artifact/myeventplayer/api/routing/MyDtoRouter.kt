@@ -8,6 +8,7 @@ import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import akka.pattern.PatternsCS
 import akka.util.Timeout
+import co.remotectrl.eventplayer.Aggregate
 import co.remotectrl.eventplayer.AggregateId
 import io.swagger.annotations.*
 import my.artifact.myeventplayer.api.actors.AggregateDtoMessages
@@ -72,10 +73,10 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
                         dtoActor,
                         AggregateDtoMessages.GetItems(),
                         timeout
-                ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItems<MyAggregate> }
+                ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItems }
 
-                onSuccess<AggregateDtoMessages.ReturnItems<MyAggregate>>({ returnItems }, { result ->
-                    complete<Array<MyAggregate>>(StatusCodes.OK, result.items, Jackson.marshaller())
+                onSuccess<AggregateDtoMessages.ReturnItems>({ returnItems }, { result ->
+                    complete<Array<Aggregate<*>>>(StatusCodes.OK, result.items, Jackson.marshaller())
                 })
             }
         }

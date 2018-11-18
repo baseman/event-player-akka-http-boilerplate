@@ -7,43 +7,23 @@ import org.springframework.stereotype.Service
 @Service
 class MyService {
 
-    fun commit(items: MutableList<MyAggregate>, cmd: PlayCommand<MyAggregate>) {
-
-        val index = items.size + 1
-
-        items.add(
-                getMutable(
-                        aggregate = MyAggregate(legend = AggregateLegend(index, 0), myVal = ""),
-                        cmd = cmd
-                )
-        )
-    }
-
-    fun commit(items: MutableList<MyAggregate>, aggregate: MyAggregate, cmd: PlayCommand<MyAggregate>) {
+    fun commit(items: MutableList<Any>, aggregate: Aggregate<*>) {
 
         val itemIndex = items.indexOfFirst {
-            it.legend.aggregateId.value == aggregate.legend.aggregateId.value
+            (it as Aggregate<*>).legend.aggregateId.value == aggregate.legend.aggregateId.value
         }
 
-        items[itemIndex] = getMutable(
-                aggregate = aggregate,
-                cmd = cmd
-        )
+        when (itemIndex) {
+            -1 -> items.add(aggregate)
+            else -> items[itemIndex] = aggregate
+        }
     }
 
-    private fun getMutable(aggregate: MyAggregate, cmd: PlayCommand<MyAggregate>): MyAggregate {
-        val evt = cmd.executeOn(aggregate)
-        val mutableAggregate = MutableAggregate(aggregate)
-        evt.applyTo(mutableAggregate)
-        return mutableAggregate.model
-    }
-
-    fun getAggregates(items: MutableList<MyAggregate>): Array<MyAggregate> {
+    fun getAggregates(items: MutableList<Aggregate<*>>): Array<Aggregate<*>> {
         return items.toTypedArray()
     }
 
-    fun getAggregate(items: MutableList<MyAggregate>, aggregateId: AggregateId<out Aggregate<*>>): MyAggregate? {
+    fun getAggregate(items: MutableList<Aggregate<*>>, aggregateId: AggregateId<out Aggregate<*>>): Aggregate<*>? {
         return getAggregates(items).find { it.legend.aggregateId.value == aggregateId.value }
     }
-
 }
