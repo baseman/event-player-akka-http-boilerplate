@@ -8,13 +8,9 @@ import akka.http.javadsl.server.Route
 import akka.http.javadsl.server.directives.RouteDirectives
 import akka.pattern.PatternsCS
 import akka.util.Timeout
-import co.remotectrl.eventplayer.Aggregate
-import co.remotectrl.eventplayer.AggregateId
-import co.remotectrl.eventplayer.MutableAggregate
-import co.remotectrl.eventplayer.PlayCommand
+import co.remotectrl.eventplayer.*
 import my.artifact.myeventplayer.api.actors.AggregateCommandMessages
 import my.artifact.myeventplayer.api.actors.AggregateDtoMessages
-import scala.reflect.internal.Trees
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 
@@ -26,9 +22,13 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
                 complete(StatusCodes.BAD_REQUEST, e.message)
             }.build()
 
-    inline fun <reified TCommand : PlayCommand<TAggregate>> commandExecute(aggregate: TAggregate): Route = handleExceptions(invalidInputHandler) {
+    inline fun <reified TCommand : PlayCommand<TAggregate>> commandExecute(noinline factory: (AggregateLegend<TAggregate>) -> TAggregate): Route = handleExceptions(invalidInputHandler) {
         commandUnmarshaller.commandEntity<TCommand> { command ->
-            onSuccess(askPlay(aggregate = aggregate, command = command), this::complete)
+            val created = askGetNewItem(factory = factory).thenCompose { aggregate ->
+                askPlayPersist(aggregate = aggregate as TAggregate, command = command)
+            }
+
+            onSuccess<StatusCode>({ created }, this::complete)
         }
     }
 
@@ -41,7 +41,7 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
                 if (aggregate == null) {
                     CompletableFuture.completedFuture(StatusCodes.NOT_FOUND)
                 }
-                else askPlay(aggregate = aggregate, command = command)
+                else askPlayPersist(aggregate = aggregate, command = command)
             }
 
             onSuccess<StatusCode>({ tryCmdCompleted }, this::complete)
@@ -56,21 +56,34 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
         return mutableAggregate.model
     }
 
-    inline fun <reified TCommand : PlayCommand<TAggregate>> askPlay(aggregate: TAggregate, command: TCommand): CompletionStage<StatusCode> {
-        return CompletableFuture.completedFuture(
-                playFor(aggregate = aggregate, command = command)
-        ).thenCompose { playedAggregate ->
+    inline fun <reified TCommand : PlayCommand<TAggregate>> askPlayPersist(aggregate: TAggregate, command: TCommand): CompletionStage<StatusCode> {
+        return CompletableFuture.completedFuture(0).thenApply {
+            playFor(aggregate = aggregate, command = command)
+        }.thenCompose { playedAggregate ->
             PatternsCS.ask(
                     routeActor,
                     AggregateCommandMessages.Persist(aggregate = playedAggregate),
                     timeout
             )
         }.handle { result, err ->
-            when {
+            val statusCode = when {
                 result is AggregateCommandMessages.ActionPerformed -> StatusCodes.OK
                 err.cause ?: err is IllegalStateException -> StatusCodes.BAD_REQUEST //todo: log err
                 else -> StatusCodes.INTERNAL_SERVER_ERROR //todo: log err and result
             }
+            statusCode
+        }
+    }
+
+    fun askGetNewItem(factory: (AggregateLegend<TAggregate>) -> TAggregate): CompletionStage<TAggregate> {
+        return PatternsCS.ask(
+                routeActor,
+                AggregateDtoMessages.GetNewId(),
+                timeout
+        ).thenApply { obj ->
+            factory(
+                    AggregateLegend(aggregateIdVal = (obj as AggregateDtoMessages.ReturnId).value, latestVersion = 0)
+            )
         }
     }
 
@@ -79,6 +92,8 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
                 routeActor,
                 AggregateDtoMessages.GetItem(AggregateId<TAggregate>(aggregateId.toInt())),
                 timeout
-        ).thenApply { obj -> (obj as AggregateDtoMessages.ReturnItem<TAggregate>).item }
+        ).thenApply { obj ->
+            (obj as AggregateDtoMessages.ReturnItem<TAggregate>).item
+        }
     }
 }

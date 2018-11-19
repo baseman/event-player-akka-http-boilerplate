@@ -1,7 +1,7 @@
 package my.artifact.myeventplayer.api.services
 
-import co.remotectrl.eventplayer.*
-import my.artifact.myeventplayer.common.aggregate.MyAggregate
+import co.remotectrl.eventplayer.Aggregate
+import co.remotectrl.eventplayer.AggregateId
 import org.springframework.stereotype.Service
 
 @Service
@@ -14,9 +14,22 @@ class MyService {
         }
 
         when (itemIndex) {
-            -1 -> items.add(aggregate)
+            -1 -> {
+                items.add(aggregate)
+
+                if(seed >= 1){
+                    seed--
+                }
+            }
             else -> items[itemIndex] = aggregate
         }
+    }
+
+
+    var seed: Int = 0
+    fun getId(items: MutableList<Any>): Int{
+        seed++
+        return items.size + seed
     }
 
     fun getAggregates(items: MutableList<Aggregate<*>>): Array<Aggregate<*>> {

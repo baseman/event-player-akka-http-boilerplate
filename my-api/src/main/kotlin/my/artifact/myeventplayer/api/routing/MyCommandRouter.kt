@@ -5,6 +5,7 @@ import akka.http.javadsl.server.AllDirectives
 import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import akka.util.Timeout
+import co.remotectrl.eventplayer.AggregateLegend
 import io.swagger.annotations.*
 import my.artifact.myeventplayer.api.actors.AggregateCommandMessages
 import my.artifact.myeventplayer.api.directives.CommandRouteDirective
@@ -55,7 +56,7 @@ class MyCommandRouter(
         return pathEnd {
             post {
                 route(
-                        commandHandler.commandExecute<MyCreateCommand>(MyAggregate()) //todo: can add additional routes here
+                        commandHandler.commandExecute<MyCreateCommand>(createAggregate) //todo: can add additional routes here
                 )
             }
         }
@@ -87,6 +88,10 @@ class MyCommandRouter(
                     }
                 }
         )
+    }
+
+    companion object {
+        private val createAggregate: (AggregateLegend<MyAggregate>) -> MyAggregate = { it -> MyAggregate(it) }
     }
 
 }

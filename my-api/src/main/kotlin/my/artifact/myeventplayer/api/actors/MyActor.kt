@@ -21,6 +21,8 @@ class MyActor(private val myService: MyService) : AbstractActor() {
         }
     }
 
+    var seed: Int = 0
+
     override fun createReceive(): Receive {
         return receiveBuilder()
                 .match(AggregateCommandMessages.Persist::class.java) {
@@ -37,6 +39,9 @@ class MyActor(private val myService: MyService) : AbstractActor() {
                         sender.tell(AggregateCommandMessages.ActionPerformed(), self)
                     }
 
+                }
+                .match(AggregateDtoMessages.GetNewId::class.java) {
+                    sender.tell(AggregateDtoMessages.ReturnId(value = myService.getId(MyRepository.items)), self)
                 }
                 .match(AggregateDtoMessages.GetItems::class.java) { getMsgs ->
 
@@ -66,9 +71,11 @@ interface AggregateDtoMessages{
     class GetItems
     class ReturnItem<TAggregate : Aggregate<*>>(val item: TAggregate?)
     class ReturnItems(val items: Array<Aggregate<*>>)
+    class GetNewId
+    class ReturnId(val value: Int)
 }
 
 interface AggregateCommandMessages{
-    class Persist<TAggregate : Aggregate<TAggregate>, TCommand: PlayCommand<TAggregate>>(val aggregate: TAggregate)
-    class ActionPerformed()
+    class Persist<TAggregate : Aggregate<TAggregate>>(val aggregate: TAggregate)
+    class ActionPerformed
 }

@@ -89,14 +89,14 @@ class RouteTest : JUnitRouteTest() {
         testRoute(appServer.route).run(
                 HttpRequest.POST("/my/cmd").withEntity(
                         MediaTypes.applicationWithFixedCharset("vnd.$createCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
-                        ""
+                        ObjectMapper().writeValueAsString(MyCreateCommand(""))
                 )
         ).assertStatusCode(StatusCodes.BAD_REQUEST)
 
         testRoute(appServer.route).run(
                 HttpRequest.POST("/my/cmd/1").withEntity(
                         MediaTypes.applicationWithFixedCharset("vnd.$changeCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
-                        ""
+                        ObjectMapper().writeValueAsString(MyChangeCommand(""))
                 )
         ).assertStatusCode(StatusCodes.BAD_REQUEST)
 
