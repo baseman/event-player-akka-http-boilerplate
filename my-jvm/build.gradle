@@ -1,11 +1,11 @@
-group 'my.artifact.myeventplayer.jvm'
-version '1.0-SNAPSHOT'
+group "my.artifact.myeventplayer.jvm"
+version "1.0-SNAPSHOT"
 
-apply plugin: 'kotlin-platform-jvm'
-apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: "kotlin-platform-jvm"
+apply plugin: "org.junit.platform.gradle.plugin"
 
 buildscript {
-    ext.kotlin_version = '1.3.10'
+    ext.kotlinVersion = "1.3.10"
 
     repositories {
         mavenCentral()
@@ -13,8 +13,8 @@ buildscript {
         maven { url "http://repo.spring.io/plugins-release/" }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath("org.junit.platform:junit-platform-gradle-plugin:1.0.0")
     }
 }
 
@@ -28,18 +28,19 @@ repositories {
 junitPlatform {
     filters {
         engines {
-            include 'spek'
+            include "spek"
         }
     }
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
+    compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 
-    testCompile 'org.jetbrains.spek:spek-api:1.1.5'
-    testRuntime 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
-    testCompile "org.amshove.kluent:kluent:1.24"
+    testCompile("org.jetbrains.spek:spek-api:1.1.5")
+    testRuntime("org.jetbrains.spek:spek-junit-platform-engine:1.1.5")
+    testCompile("org.amshove.kluent:kluent:1.24")
 
-    expectedBy project(':event-player')
-    expectedBy project(':my-common')
+    expectedBy project(":event-player")
+    expectedBy project(":my-common")
 }
