@@ -1,36 +1,31 @@
-group = "co.remotectrl.api"
-version = "0.0.1-SNAPSHOT"
+group = 'co.remotectrl.api'
+version = '0.0.1-SNAPSHOT'
 
-apply plugin: "java"
-apply plugin: "war"
-apply plugin: "com.google.cloud.tools.appengine"
+//apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 
-apply plugin: "kotlin-spring"
-apply plugin: "eclipse"
-apply plugin: "org.springframework.boot"
-apply plugin: "io.spring.dependency-management"
-
-apply plugin: "kotlin-platform-jvm"
-apply plugin: "org.junit.platform.gradle.plugin"
+apply plugin: 'kotlin-platform-jvm'
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 buildscript {
   ext {
-    kotlinVersion = "1.3.10"
-    springBootVersion = "2.0.3.RELEASE"
-    akkaVersion = "10.1.4"
+    kotlinVersion = '1.3.10'
+    springBootVersion = '2.0.3.RELEASE'
+    akkaVersion = '10.1.4'
   }
   repositories {
-    jcenter()
     mavenCentral()
     maven { url "http://dl.bintray.com/jetbrains/spek" }
     maven { url "http://repo.spring.io/plugins-release/" }
   }
   dependencies {
-    classpath("com.google.cloud.tools:appengine-gradle-plugin:1.+")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
     classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
     classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    classpath("org.junit.platform:junit-platform-gradle-plugin:1.0.0")
+    classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
   }
 }
 
@@ -49,17 +44,15 @@ repositories {
   maven { url "http://repo.spring.io/plugins-release/" }
 }
 
-dependencies {
-  compile("com.google.appengine:appengine-api-1.0-sdk:+")
-  providedCompile("javax.servlet:javax.servlet-api:3.1.0")
-  
-  compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-  compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+test {
+  useJUnitPlatform()
+}
 
-  compile("org.springframework.boot:spring-boot-starter"){
-    exclude(module: "jul-to-slf4j")
-    exclude(module: "spring-boot-starter-tomcat")
-  }
+dependencies {
+  compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+  compile("org.jetbrains.kotlin:kotlin-reflect")
+
+  compile("org.springframework.boot:spring-boot-starter")
 
   compile("com.typesafe.akka:akka-http_2.12:${akkaVersion}")
   compile("com.typesafe.akka:akka-http-jackson_2.12:${akkaVersion}")
@@ -80,15 +73,12 @@ dependencies {
 
 }
 
-test {
-  useJUnitPlatform()
-}
 
-appengineDeploy.dependsOn test
-appengineStage.dependsOn test
+jar {
+  manifest {}
 
-appengine {
-  deploy {
-
-  }
+  // This line of code recursively collects and copies all of a project's files
+  // and adds them to the JAR itself. One can extend this task, to skip certain
+  // files or particular types at will
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
