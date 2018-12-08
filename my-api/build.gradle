@@ -2,7 +2,6 @@ group = "co.remotectrl.api"
 version = "0.0.1-SNAPSHOT"
 
 apply plugin: "java"
-apply plugin: "war"
 apply plugin: "com.google.cloud.tools.appengine"
 
 apply plugin: "kotlin-spring"
@@ -45,16 +44,19 @@ sourceCompatibility = 1.8
 
 repositories {
   mavenCentral()
+
+  maven { url "http://repo.maven.apache.org/maven2" }
+
   maven { url "http://dl.bintray.com/jetbrains/spek" }
   maven { url "http://repo.spring.io/plugins-release/" }
 }
 
 dependencies {
   compile("com.google.appengine:appengine-api-1.0-sdk:+")
-  providedCompile("javax.servlet:javax.servlet-api:3.1.0")
   
   compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
   compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+
 
   compile("org.springframework.boot:spring-boot-starter"){
     exclude(module: "jul-to-slf4j")
@@ -91,4 +93,21 @@ appengine {
   deploy {
 
   }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/resources", "src/main/configs"
+        }
+    }
+}
+
+jar {
+    manifest {}
+
+    // This line of code recursively collects and copies all of a project's files
+    // and adds them to the JAR itself. One can extend this task, to skip certain
+    // files or particular types at will
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }

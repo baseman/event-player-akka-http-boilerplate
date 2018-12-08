@@ -23,7 +23,7 @@ class MyApplication : ApplicationRunner{
 
                         // hook for akka, will be used for any stops, not only by signals
                         system.registerOnTermination {
-                            System.exit(0)
+                            println("ActorSystem terminated")
                         }
 
                         system.terminate()

@@ -11,3 +11,11 @@ For updating submodules you can use the following my.artifact.myeventplayer.comm
 
     git submodule update --recursive --remote
     
+
+# Deployment
+
+To deploy create GCP cloud project in dashboard and run the following scripts
+
+    gcloud config set project <gcp-project-id>
+    gcloud app create
+    ./gradlew appengineDeploy

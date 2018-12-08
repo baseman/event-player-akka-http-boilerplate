@@ -50,9 +50,13 @@ class MyRouter(
         return route(
                 swaggerDocRouter.createRoute(),
                 path("swagger") {
-                    getFromResource("swagger/index.html")
+                    getFromResource("BOOT-INF/classes/swagger/index.html")
                 },
-                getFromResourceDirectory("swagger")
+                    getFromResourceDirectory("BOOT-INF/classes/swagger")
+//                path("swagger") {
+//                    getFromResource("swagger/index.html")
+//                },
+//                getFromResourceDirectory("swagger")
         )
     }
 }
