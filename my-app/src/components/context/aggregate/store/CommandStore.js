@@ -13,9 +13,9 @@ class CommandStore extends Component {
         err: null
     };
 
-    queue = (command) => {
+    queue = (command, aggregateId) => {
         this.setState((state) => ({
-            items: state.items.concat(command), //add items to end of queue
+            items: state.items.concat({command: command, aggregateId: aggregateId}), //add items to end of queue
             deadLetterItems: state.deadLetterItems,
             isProcessing: state.isProcessing,
             err: null
