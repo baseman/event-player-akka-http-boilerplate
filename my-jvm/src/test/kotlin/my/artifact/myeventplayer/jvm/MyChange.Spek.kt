@@ -24,8 +24,13 @@ class MyAggregateTest : Spek({
                 "blah"
         )
 
-        it("should try to validate Change my.artifact.myeventplayer.common.aggregate.command input") {
-            { MyCreateCommand("").executeOn(actual) } shouldThrow AnyException
+        it("should try to validate Change Command command input") {
+            AssertUtil.assertExecution(
+                    MyCreateCommand("").executeOn(actual),
+                    PlayExecution.Invalidated(items = arrayOf(
+                            PlayInvalidInput("myInitialVal should not be empty")
+                    ))
+            )
         }
 
         val evtIdVal = 0
@@ -33,11 +38,11 @@ class MyAggregateTest : Spek({
 
         val eventLegend = EventLegend(evtId, aggregateId, 2)
 
-        it("should produce Changed my.artifact.myeventplayer.common.aggregate.event on successful Commit my.artifact.myeventplayer.common.aggregate.command") {
+        it("should produce Changed Event on successful Commit Command") {
 
-            AssertUtil.assertEvent(
-                    MyCreateCommand("initial blah").executeOn(actual).legend,
-                    MyCreatedEvent(eventLegend, "initial blah").legend
+            AssertUtil.assertExecution(
+                    MyCreateCommand("initial blah").executeOn(actual),
+                    PlayExecution.Validated(event = MyCreatedEvent(eventLegend, "initial blah"))
             )
         }
 
@@ -46,17 +51,17 @@ class MyAggregateTest : Spek({
             actual.legend.latestVersion shouldEqual expected.legend.latestVersion
         }
 
-        it("should apply Changed my.artifact.myeventplayer.common.aggregate.event to the MyAggregate") {
+        it("should apply Changed Event to MyAggregate") {
             val evt = MyCreatedEvent(EventLegend(evtId, aggregateId, 2), "blah changed")
 
             val actualMutableAggregate = MutableAggregate(actual)
             evt.applyTo(actualMutableAggregate)
 
-            AssertUtil.assertAggregateEvent(actualMutableAggregate.model.legend, evt)
+            AssertUtil.assertAggregateEvent(actualMutableAggregate.aggregate.legend, evt)
 
             val expected = MyAggregate(AggregateLegend(aggregateId, 2), "blah changed")
 
-            assertModel(actualMutableAggregate.model, expected)
+            assertModel(actualMutableAggregate.aggregate, expected)
         }
 
     }
@@ -72,7 +77,14 @@ class MyAggregateTest : Spek({
         )
 
         it("should try to validate Change my.artifact.myeventplayer.common.aggregate.command input") {
-            { MyChangeCommand("").executeOn(actual) } shouldThrow AnyException
+
+            AssertUtil.assertExecution(
+                    MyChangeCommand("").executeOn(actual),
+                    PlayExecution.Invalidated(items = arrayOf(
+                            PlayInvalidInput("myInitialVal should not be empty")
+                    ))
+            )
+
         }
 
         val evtIdVal = 0
@@ -82,9 +94,9 @@ class MyAggregateTest : Spek({
 
         it("should produce Changed my.artifact.myeventplayer.common.aggregate.event on successful Commit my.artifact.myeventplayer.common.aggregate.command") {
 
-            AssertUtil.assertEvent(
-                    MyChangeCommand("change blah").executeOn(actual).legend,
-                    MyChangedEvent(eventLegend, "change blah").legend
+            AssertUtil.assertExecution(
+                    MyChangeCommand("change blah").executeOn(actual),
+                    PlayExecution.Validated(event = MyChangedEvent(eventLegend, "change blah"))
             )
         }
 
@@ -99,11 +111,11 @@ class MyAggregateTest : Spek({
             val actualMutableAggregate = MutableAggregate(actual)
             evt.applyTo(actualMutableAggregate)
 
-            AssertUtil.assertAggregateEvent(actualMutableAggregate.model.legend, evt)
+            AssertUtil.assertAggregateEvent(actualMutableAggregate.aggregate.legend, evt)
 
             val expected = MyAggregate(AggregateLegend(aggregateId, 2), "blah changed")
 
-            assertModel(actualMutableAggregate.model, expected)
+            assertModel(actualMutableAggregate.aggregate, expected)
         }
 
     }

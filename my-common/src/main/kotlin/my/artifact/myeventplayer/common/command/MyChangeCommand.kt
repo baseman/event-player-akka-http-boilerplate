@@ -5,17 +5,14 @@ import my.artifact.myeventplayer.common.aggregate.MyAggregate
 import my.artifact.myeventplayer.common.event.MyChangedEvent
 
 data class MyChangeCommand(var myChangeVal: String) : PlayCommand<MyAggregate> {
-
     companion object {
+
         const val mediaType = "application/vnd.my.artifact.myeventplayer.common.command.MyChangeCommand.api.v1+json"
     }
-
     constructor() : this("")
 
-    override fun validate(model: MyAggregate) {
-        if(myChangeVal.isEmpty()){
-            throw IllegalStateException("Invalid commit input")
-        }
+    override fun validate(aggregate: MyAggregate, validation: PlayValidation) {
+        validation.assert({myChangeVal.isNotEmpty()}, "myInitialVal should not be empty")
     }
 
     override fun getEvent(aggregateId: AggregateId<MyAggregate>, version: Int): PlayEvent<MyAggregate> {

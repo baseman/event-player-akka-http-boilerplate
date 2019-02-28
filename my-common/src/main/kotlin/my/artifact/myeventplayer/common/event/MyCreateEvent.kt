@@ -9,7 +9,7 @@ data class MyCreatedEvent(
         override val legend: EventLegend<MyAggregate>,
         val myInitialVal: String
 ) : PlayEvent<MyAggregate> {
-    override fun applyChangesTo(model: MyAggregate, latestVersion: Int): MyAggregate {
+    override fun applyChangesTo(aggregate: MyAggregate, latestVersion: Int): MyAggregate {
         return MyAggregate(
                 AggregateLegend(legend.aggregateId, latestVersion),
                 myVal = myInitialVal)

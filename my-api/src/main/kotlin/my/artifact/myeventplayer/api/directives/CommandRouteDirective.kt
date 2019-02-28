@@ -19,8 +19,8 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
     val commandUnmarshaller = CommandUnmarshallingDirective<TAggregate>()
 
     val invalidInputHandler: ExceptionHandler = ExceptionHandler.newBuilder().match(IllegalArgumentException::class.java) { e ->
-                complete(StatusCodes.BAD_REQUEST, e.message)
-            }.build()
+        complete(StatusCodes.BAD_REQUEST, e.message)
+    }.build()
 
     inline fun <reified TCommand : PlayCommand<TAggregate>> commandExecute(noinline factory: (AggregateLegend<TAggregate>) -> TAggregate): Route = handleExceptions(invalidInputHandler) {
         commandUnmarshaller.commandEntity<TCommand> { command ->
@@ -40,8 +40,7 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
 
                 if (aggregate == null) {
                     CompletableFuture.completedFuture(StatusCodes.NOT_FOUND)
-                }
-                else askPlayPersist(aggregate = aggregate, command = command)
+                } else askPlayPersist(aggregate = aggregate, command = command)
             }
 
             onSuccess<StatusCode>({ tryCmdCompleted }, this::complete)
@@ -49,29 +48,35 @@ class CommandRouteDirective<TAggregate : Aggregate<TAggregate>>(val routeActor: 
 
     }
 
-    inline fun <reified TCommand : PlayCommand<TAggregate>> playFor(aggregate: TAggregate, command: TCommand): TAggregate {
-        val evt = command.executeOn(aggregate)
-        val mutableAggregate = MutableAggregate(aggregate)
-        evt.applyTo(mutableAggregate)
-        return mutableAggregate.model
+    inline fun <reified TEvent : PlayEvent<TAggregate>> playFor(aggregate: TAggregate, event: TEvent): TAggregate {
+        val mutable = MutableAggregate(aggregate)
+
+        event.applyTo(mutable)
+
+        return mutable.aggregate
     }
 
     inline fun <reified TCommand : PlayCommand<TAggregate>> askPlayPersist(aggregate: TAggregate, command: TCommand): CompletionStage<StatusCode> {
-        return CompletableFuture.completedFuture(0).thenApply {
-            playFor(aggregate = aggregate, command = command)
-        }.thenCompose { playedAggregate ->
-            PatternsCS.ask(
-                    routeActor,
-                    AggregateCommandMessages.Persist(aggregate = playedAggregate),
-                    timeout
-            )
-        }.handle { result, err ->
-            val statusCode = when {
-                result is AggregateCommandMessages.ActionPerformed -> StatusCodes.OK
-                err.cause ?: err is IllegalStateException -> StatusCodes.BAD_REQUEST //todo: log err
-                else -> StatusCodes.INTERNAL_SERVER_ERROR //todo: log err and result
+        val exe = command.executeOn(aggregate)
+
+        val exeStage = when (exe) {
+            is PlayExecution.Validated -> {
+                PatternsCS.ask(
+                        routeActor,
+                        AggregateCommandMessages.Persist(aggregate = playFor(aggregate = aggregate, event = exe.event)),
+                        timeout
+                ).thenApply { StatusCodes.OK }
             }
-            statusCode
+            is PlayExecution.Invalidated -> {
+                CompletableFuture.completedFuture(StatusCodes.BAD_REQUEST)
+            }
+        }
+
+        return exeStage.handle { result, err ->
+            when {
+                err != null -> StatusCodes.INTERNAL_SERVER_ERROR
+                else -> result
+            }
         }
     }
 
