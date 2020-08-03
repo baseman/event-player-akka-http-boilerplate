@@ -2,7 +2,7 @@ group 'my.artifact.myeventplayer.common'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.3.10'
+    ext.kotlin_version = '1.3.50'
 
     repositories {
         mavenCentral()
@@ -19,6 +19,6 @@ repositories {
 }
 
 dependencies {
-    compile project(':event-player')
-    compile "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    implementation project(':event-player')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
 }
