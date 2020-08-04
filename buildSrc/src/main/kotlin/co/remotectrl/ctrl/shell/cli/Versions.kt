@@ -7,7 +7,7 @@ object Versions {
     }
 
     object Dependencies {
-        const val kotlin = "1.3.61"
+        const val kotlin = "1.4.0-rc"
         const val serialization = "0.14.0"
         const val coroutine = "1.3.3"
         const val springBootVersion = "2.0.3.RELEASE"

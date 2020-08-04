@@ -1,29 +1,18 @@
+import co.remotectrl.ctrl.shell.cli.configureJUNITReports
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 repositories {
   jcenter()
-  mavenCentral()
-//  maven { url "http://dl.bintray.com/jetbrains/spek" }
-//  maven { url "http://repo.spring.io/plugins-release/" }
-//  maven { url "https://plugins.gradle.org/m2/"}
-//
-//  maven { url "http://dl.bintray.com/jetbrains/spek" }
-//  maven { url "http://repo.spring.io/plugins-release/" }
 }
 
 plugins {
   kotlin("jvm")
-  kotlin("plugin.spring") version "1.3.61"
+  kotlin("plugin.spring") version "1.4.0-rc"
   application
-//  id("eclipse") version "5.2.0"
   id("org.springframework.boot") version "2.2.2.RELEASE"
   id("io.spring.dependency-management") version "1.0.8.RELEASE"
-//  "jacoco"
+  id("com.github.johnrengelman.shadow") version "4.0.4"
 }
-
-//classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-//classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
-//classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-//classpath("org.junit.platform:junit-platform-gradle-plugin:1.0.0")
-//classpath("org.sonarqube:org.sonarqube.gradle.plugin:$sonarVersion")
 
 kotlin {
   sourceSets {
@@ -67,54 +56,20 @@ application {
   mainClassName = "co.remotectrl.ctrl.shell.application.CtrlShellKt"
 }
 
-//test {
-//  useJUnitPlatform()
-//}
+tasks {
+  named<ShadowJar>("shadowJar") {
+    archiveBaseName.set("ctrl-shell")
+    mergeServiceFiles()
+    manifest {
+      attributes(mapOf("Main-Class" to application.mainClassName))
+    }
+  }
+}
 
+tasks {
+  build {
+    dependsOn(shadowJar)
+  }
+}
 
-
-//jar {
-//  manifest {}
-//
-//  // This line of code recursively collects and copies all of a project's files
-//  // and adds them to the JAR itself. One can extend this task, to skip certain
-//  // files or particular types at will
-//  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-//}
-
-//test {
-//  jacoco {
-//
-//  }
-//}
-
-//jacocoTestReport {
-//  reports {
-//    xml.enabled = false
-//    csv.enabled = false
-//    html.destination file("${buildDir}/jacocoHtml")
-//  }
-//}
-//
-//
-//jacocoTestCoverageVerification {
-//  violationRules {
-//    rule {
-//      limit {
-//        minimum = 0.5
-//      }
-//    }
-//
-//    rule {
-//      enabled = false
-//      element = 'CLASS'
-//      includes = ['org.gradle.*']
-//
-//      limit {
-//        counter = 'LINE'
-//        value = 'TOTALCOUNT'
-//        maximum = 0.3
-//      }
-//    }
-//  }
-//}
+configureJUNITReports(tasks)
