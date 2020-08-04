@@ -1,9 +1,0 @@
-rootProject.name = 'myeventplayer'
-
-include ':event-player'
-include ':my-common'
-include ':my-jvm'
-include ':my-js'
-include ':my-api'
-include ':my-scenarios'
-include ':my-k8s'

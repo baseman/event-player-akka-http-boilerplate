@@ -44,7 +44,7 @@ task gatlingRun(type: JavaExec) {
   new File("${buildDir}/reports/gatling").mkdirs()
   classpath = sourceSets.simulations.runtimeClasspath + configurations.gatling
   main = "io.gatling.app.Gatling"
-  args = ["--simulation", "my.artifact.myeventplayer.scenarios.load.MyLoad",
+  args = ["--simulation", "co.remotectrl.myevent.scenarios.load.MyLoad",
           "--simulations-folder", "simulations/resources",
           "--data-folder", "simulations/resources",
           "--results-folder", "${buildDir}/reports/gatling"

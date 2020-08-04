@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import My from 'my';
 
-const MyCreateCommand = My.my.artifact.myeventplayer.common.command.MyCreateCommand;
+const MyCreateCommand = My.co.remotectrl.myevent.common.command.MyCreateCommand;
 
 class MyTask extends Component{
 
