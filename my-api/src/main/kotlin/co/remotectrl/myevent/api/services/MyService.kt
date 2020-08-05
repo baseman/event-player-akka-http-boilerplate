@@ -1,16 +1,16 @@
 package co.remotectrl.myevent.api.services
 
-import co.remotectrl.eventplayer.Aggregate
-import co.remotectrl.eventplayer.AggregateId
+import co.remotectrl.ctrl.event.AggregateId
+import co.remotectrl.ctrl.event.CtrlAggregate
 import org.springframework.stereotype.Service
 
 @Service
 class MyService {
 
-    fun commit(items: MutableList<Any>, aggregate: Aggregate<*>) {
+    fun commit(items: MutableList<Any>, aggregate: CtrlAggregate<*>) {
 
         val itemIndex = items.indexOfFirst {
-            (it as Aggregate<*>).legend.aggregateId.value == aggregate.legend.aggregateId.value
+            (it as CtrlAggregate<*>).legend.aggregateId.value == aggregate.legend.aggregateId.value
         }
 
         when (itemIndex) {
@@ -27,16 +27,16 @@ class MyService {
 
 
     var seed: Int = 0
-    fun getId(items: MutableList<Any>): Int{
+    fun getId(items: MutableList<Any>): String{
         seed++
-        return items.size + seed
+        return (items.size + seed).toString()
     }
 
-    fun getAggregates(items: MutableList<Aggregate<*>>): Array<Aggregate<*>> {
+    fun getAggregates(items: MutableList<CtrlAggregate<*>>): Array<CtrlAggregate<*>> {
         return items.toTypedArray()
     }
 
-    fun getAggregate(items: MutableList<Aggregate<*>>, aggregateId: AggregateId<out Aggregate<*>>): Aggregate<*>? {
+    fun getAggregate(items: MutableList<CtrlAggregate<*>>, aggregateId: AggregateId<out CtrlAggregate<*>>): CtrlAggregate<*>? {
         return getAggregates(items).find { it.legend.aggregateId.value == aggregateId.value }
     }
 }

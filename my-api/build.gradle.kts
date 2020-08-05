@@ -19,7 +19,7 @@ kotlin {
     val main by getting {
       dependencies {
         implementation(kotlin("stdlib-jdk8"))
-        implementation(project(":event-player"))
+        implementation(project(":event-ctrl"))
         implementation(project(":my-common"))
 
         implementation("org.jetbrains.kotlin:kotlin-reflect")

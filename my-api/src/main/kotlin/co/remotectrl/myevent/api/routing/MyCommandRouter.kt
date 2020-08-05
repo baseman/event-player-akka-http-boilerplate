@@ -5,7 +5,7 @@ import akka.http.javadsl.server.AllDirectives
 import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import akka.util.Timeout
-import co.remotectrl.eventplayer.AggregateLegend
+import co.remotectrl.ctrl.event.AggregateLegend
 import io.swagger.annotations.*
 import co.remotectrl.myevent.api.actors.AggregateCommandMessages
 import co.remotectrl.myevent.api.directives.CommandRouteDirective

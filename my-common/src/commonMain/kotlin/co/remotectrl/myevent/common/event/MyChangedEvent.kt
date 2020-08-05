@@ -1,12 +1,14 @@
 package co.remotectrl.myevent.common.event
 
-import co.remotectrl.eventplayer.*
+import co.remotectrl.ctrl.event.AggregateLegend
+import co.remotectrl.ctrl.event.CtrlEvent
+import co.remotectrl.ctrl.event.EventLegend
 import co.remotectrl.myevent.common.aggregate.MyAggregate
 
 data class MyChangedEvent(
         override val legend: EventLegend<MyAggregate>,
         val myChangeVal: String
-) : PlayEvent<MyAggregate> {
+) : CtrlEvent<MyAggregate> {
 
     override fun applyChangesTo(aggregate: MyAggregate, latestVersion: Int): MyAggregate {
         return MyAggregate(
@@ -14,6 +16,6 @@ data class MyChangedEvent(
                 myVal = myChangeVal)
     }
 
-    constructor() : this(EventLegend(0, 0, 0), "")
+    constructor() : this(EventLegend("", "", 0), "")
 
 }

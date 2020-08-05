@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0-rc")
+    }
+}
+
 plugins {
     kotlin("multiplatform")
 }
@@ -7,6 +16,7 @@ repositories {
 }
 
 kotlin {
+
     targets {
         jvm {
         }
@@ -15,14 +25,13 @@ kotlin {
             useCommonJs()
         }
     }
+
     sourceSets {
         commonMain {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation(project(":event-ctrl"))
             }
         }
-
         commonTest {
             dependencies {
                 implementation(kotlin("test-common"))
@@ -40,7 +49,6 @@ kotlin {
                 implementation(kotlin("test-junit"))
             }
         }
-
         val jsMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-js"))

@@ -8,8 +8,8 @@ import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import akka.pattern.PatternsCS
 import akka.util.Timeout
-import co.remotectrl.eventplayer.Aggregate
-import co.remotectrl.eventplayer.AggregateId
+import co.remotectrl.ctrl.event.AggregateId
+import co.remotectrl.ctrl.event.CtrlAggregate
 import io.swagger.annotations.*
 import co.remotectrl.myevent.api.actors.AggregateDtoMessages
 import co.remotectrl.myevent.common.aggregate.MyAggregate
@@ -41,7 +41,7 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
                     //            get {
                     val returnItem = PatternsCS.ask(
                             dtoActor,
-                            AggregateDtoMessages.GetItem<MyAggregate>(AggregateId(aggregateId.toInt())),
+                            AggregateDtoMessages.GetItem<MyAggregate>(AggregateId(aggregateId)),
                             timeout
                     ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItem<MyAggregate> }
 
@@ -76,7 +76,7 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
                 ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItems }
 
                 onSuccess<AggregateDtoMessages.ReturnItems>({ returnItems }, { result ->
-                    complete<Array<Aggregate<*>>>(StatusCodes.OK, result.items, Jackson.marshaller())
+                    complete<Array<CtrlAggregate<*>>>(StatusCodes.OK, result.items, Jackson.marshaller())
                 })
             }
         }

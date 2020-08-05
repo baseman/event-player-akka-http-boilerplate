@@ -2,7 +2,7 @@ rootProject.name = "myevent"
 enableFeaturePreview("GRADLE_METADATA")
 
 include (
- ":event-player",
+ ":event-ctrl",
  ":my-common",
  ":my-jvm",
  ":my-js",

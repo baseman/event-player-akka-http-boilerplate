@@ -2,9 +2,8 @@ package co.remotectrl.myevent.api.actors
 
 import akka.actor.AbstractActor
 import akka.event.Logging
-import co.remotectrl.eventplayer.Aggregate
-import co.remotectrl.eventplayer.AggregateId
-import co.remotectrl.eventplayer.PlayCommand
+import co.remotectrl.ctrl.event.AggregateId
+import co.remotectrl.ctrl.event.CtrlAggregate
 import co.remotectrl.myevent.api.services.MyService
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
@@ -46,7 +45,7 @@ class MyActor(private val myService: MyService) : AbstractActor() {
                 .match(AggregateDtoMessages.GetItems::class.java) { getMsgs ->
 
                     sender.let {
-                        val items = myService.getAggregates(MyRepository.items as MutableList<Aggregate<*>>)
+                        val items = myService.getAggregates(MyRepository.items as MutableList<CtrlAggregate<*>>)
                         it.tell(AggregateDtoMessages.ReturnItems(items = items), self)
                     }
 
@@ -54,7 +53,7 @@ class MyActor(private val myService: MyService) : AbstractActor() {
                 .match(AggregateDtoMessages.GetItem::class.java) { getMsg ->
 
                     sender.let {
-                        val item = myService.getAggregate(MyRepository.items as MutableList<Aggregate<*>>, getMsg.aggregateId)
+                        val item = myService.getAggregate(MyRepository.items as MutableList<CtrlAggregate<*>>, getMsg.aggregateId)
                         it.tell(AggregateDtoMessages.ReturnItem(item = item), self)
                     }
 
@@ -67,15 +66,15 @@ class MyActor(private val myService: MyService) : AbstractActor() {
 }
 
 interface AggregateDtoMessages{
-    class GetItem<TAggregate : Aggregate<TAggregate>>(val aggregateId: AggregateId<TAggregate>)
+    class GetItem<TAggregate : CtrlAggregate<TAggregate>>(val aggregateId: AggregateId<TAggregate>)
     class GetItems
-    class ReturnItem<TAggregate : Aggregate<*>>(val item: TAggregate?)
-    class ReturnItems(val items: Array<Aggregate<*>>)
+    class ReturnItem<TAggregate : CtrlAggregate<*>>(val item: TAggregate?)
+    class ReturnItems(val items: Array<CtrlAggregate<*>>)
     class GetNewId
-    class ReturnId(val value: Int)
+    class ReturnId(val value: String)
 }
 
 interface AggregateCommandMessages{
-    class Persist<TAggregate : Aggregate<TAggregate>>(val aggregate: TAggregate)
+    class Persist<TAggregate : CtrlAggregate<TAggregate>>(val aggregate: TAggregate)
     class ActionPerformed
 }

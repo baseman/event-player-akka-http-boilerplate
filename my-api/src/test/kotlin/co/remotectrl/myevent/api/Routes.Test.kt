@@ -68,13 +68,13 @@ class RouteTest : JUnitRouteTest() {
                 HttpRequest.GET("/my/items")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("[{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":2},\"myVal\":\"blah\"}]")
+                .assertEntity("[{\"legend\":{\"aggregateId\":{\"value\":\"1\"},\"latestVersion\":2},\"myVal\":\"blah\"}]")
 
         testRoute(appServer.route).run(
                 HttpRequest.GET("/my/item/1")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("{\"legend\":{\"aggregateId\":{\"value\":1},\"latestVersion\":2},\"myVal\":\"blah\"}")
+                .assertEntity("{\"legend\":{\"aggregateId\":{\"value\":\"1\"},\"latestVersion\":2},\"myVal\":\"blah\"}")
 
 
         //todo: generic errors is likely a sign which testing a library maybe more suitable that testing at the api level -- identify if this is possible
