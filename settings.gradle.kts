@@ -7,6 +7,6 @@ include (
  ":my-jvm",
  ":my-js",
  ":my-api",
-// ":my-scenarios",
+ ":my-scenarios",
  ":my-k8s"
 )
