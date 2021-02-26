@@ -5,8 +5,8 @@ apply plugin: 'scala'
 
 buildscript {
   ext {
-    scalaVersion = "2.11.8"
-    gatlingVersion = "2.2.4"
+    scalaVersion = "2.12.13"
+    gatlingVersion = "3.5.1"
   }
 }
 
@@ -37,7 +37,6 @@ sourceSets {
     compileClasspath += configurations.gatling
   }
 }
-
 
 task gatlingRun(type: JavaExec) {
   description = "Run gatling tests"

@@ -8,7 +8,6 @@ import co.remotectrl.myevent.common.event.MyChangedEvent
 
 class MyAggregateTest {
 
-
     val aggregateIdVal = "1"
     val aggregateId = AggregateId<MyAggregate>(aggregateIdVal)
 
@@ -17,7 +16,7 @@ class MyAggregateTest {
             "blah"
     )
 
-    fun `should try to validate Change command input`() {
+    fun should_try_to_validate_Change_command_input() {
 
         AssertUtil.assertExecution(
                 MyChangeCommand("").executeOn(actual),

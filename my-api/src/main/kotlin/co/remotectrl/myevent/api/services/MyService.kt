@@ -2,9 +2,7 @@ package co.remotectrl.myevent.api.services
 
 import co.remotectrl.ctrl.event.AggregateId
 import co.remotectrl.ctrl.event.CtrlAggregate
-import org.springframework.stereotype.Service
 
-@Service
 class MyService {
 
     fun commit(items: MutableList<Any>, aggregate: CtrlAggregate<*>) {

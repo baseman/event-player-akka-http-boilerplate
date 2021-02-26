@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component
 import scala.concurrent.duration.Duration
 import java.util.concurrent.TimeUnit
 
-@Component
 class MyRouter(
         system: ActorSystem,
         springExtension: SpringExtension

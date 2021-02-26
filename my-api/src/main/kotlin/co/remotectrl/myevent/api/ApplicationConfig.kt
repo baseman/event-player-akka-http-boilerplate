@@ -1,15 +1,16 @@
 package co.remotectrl.myevent.api
 
-import akka.actor.*
-import com.typesafe.config.*
+import akka.actor.ActorSystem
 import co.remotectrl.myevent.api.spring.SpringExtension
-import org.springframework.beans.factory.annotation.*
-import org.springframework.context.*
-import org.springframework.context.annotation.*
+import com.typesafe.config.ConfigFactory
+import org.springframework.context.ApplicationContext
+import org.springframework.context.annotation.Bean
 
-@Configuration
-class ApplicationConfig @Autowired
-constructor(private val applicationContext: ApplicationContext, private val springAkkaExtension: SpringExtension) {
+class ApplicationConfig
+constructor(
+        private val applicationContext: ApplicationContext,
+        private val springAkkaExtension: SpringExtension
+) {
 
     val system: ActorSystem = ActorSystem.create("default", ConfigFactory.load())
 

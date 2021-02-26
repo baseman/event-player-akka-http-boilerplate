@@ -11,7 +11,6 @@ import akka.stream.ActorMaterializer
 import co.remotectrl.myevent.api.routing.MyRouter
 import org.springframework.stereotype.Component
 
-@Component
 class ApplicationServer(val system: ActorSystem, router: MyRouter) {
 
     private val log: LoggingAdapter = Logging.getLogger(system, this)

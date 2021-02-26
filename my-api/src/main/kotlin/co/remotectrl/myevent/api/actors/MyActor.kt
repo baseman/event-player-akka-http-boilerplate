@@ -8,7 +8,6 @@ import co.remotectrl.myevent.api.services.MyService
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 
-@Component
 @Scope("prototype")
 class MyActor(private val myService: MyService) : AbstractActor() {
 

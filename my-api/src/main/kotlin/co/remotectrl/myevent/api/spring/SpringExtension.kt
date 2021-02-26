@@ -1,10 +1,9 @@
 package co.remotectrl.myevent.api.spring
 
-import akka.actor.*
-import org.springframework.context.*
-import org.springframework.stereotype.*
+import akka.actor.Extension
+import akka.actor.Props
+import org.springframework.context.ApplicationContext
 
-@Component
 class SpringExtension : Extension {
 
     private var applicationContext: ApplicationContext? = null
