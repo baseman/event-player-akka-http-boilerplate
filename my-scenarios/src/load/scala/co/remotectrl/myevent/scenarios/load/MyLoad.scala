@@ -24,5 +24,11 @@ class MyLoad extends Simulation {
 			)
 		)
 
-	setUp(scn.inject(atOnceUsers(1))).protocols(httpProtocol)
+	setUp(
+		scn
+		.inject(atOnceUsers(1)))
+		.protocols(httpProtocol)
+		.assertions(
+			global.successfulRequests.percent.gt(99)
+		)
 }
