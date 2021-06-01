@@ -1,18 +1,21 @@
 plugins {
-  id 'io.gatling.gradle' version "3.6.0"
-  id "scala"
+  id "io.gatling.gradle" version "3.6.0"
+  id "org.jetbrains.kotlin.jvm"
 }
-
-group = "co.remotectrl.api"
-version = "0.0.1-SNAPSHOT"
 
 repositories {
   jcenter()
 }
 
-
 gatling {
   simulations = {
     include "**/MyLoad.scala"
   }
+}
+
+dependencies {
+  implementation "com.fasterxml.jackson.core:jackson-databind:2.12.3"
+  implementation project(":my-common")
+  gatling "com.fasterxml.jackson.core:jackson-databind:2.12.3"
+  gatling project(":my-common")
 }
