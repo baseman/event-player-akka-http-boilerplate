@@ -1,8 +1,3 @@
-group = "co.remotectrl.api"
-version = "0.0.1-SNAPSHOT"
-
-apply plugin: 'scala'
-
 buildscript {
   ext {
     scalaVersion = "2.12.13"
@@ -10,48 +5,58 @@ buildscript {
   }
 }
 
+plugins {
+  id 'io.gatling.gradle' version "3.6.0"
+  id "scala"
+}
+
+group = "co.remotectrl.api"
+version = "0.0.1-SNAPSHOT"
+
 repositories {
   jcenter()
 }
 
-configurations {
-  gatling
+
+gatling {
+  simulations = {
+    include "**/MyLoad.scala"
+  }
 }
 
 dependencies {
-
-  gatling "org.scala-lang:scala-library:${scalaVersion}"
-  gatling "io.gatling:gatling-app:${gatlingVersion}"
-  gatling "io.gatling:gatling-test-framework:${gatlingVersion}"
-  gatling "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}"
+//  gatling "org.scala-lang:scala-library:${scalaVersion}"
+//  gatling "io.gatling:gatling-app:${gatlingVersion}"
+//  gatling "io.gatling:gatling-test-framework:${gatlingVersion}"
+//  gatling "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}"
 }
 
 sourceSets {
   simulations {
-    scala {
-      srcDirs = ["src/load/scala"]
-    }
-    resources {
-      srcDirs = ["src/load/resources"]
-    }
-    compileClasspath += configurations.gatling
+//    scala {
+//      srcDirs = ["src/load/scala"]
+//    }
+//    resources {
+//      srcDirs = ["src/load/resources"]
+//    }
+//    compileClasspath += configurations.gatling
   }
 }
 
-task gatlingRun(type: JavaExec) {
-  description = "Run gatling tests"
-  new File("${buildDir}/reports/gatling").mkdirs()
-  classpath = sourceSets.simulations.runtimeClasspath + configurations.gatling
-  main = "io.gatling.app.Gatling"
-  args = ["--simulation", "co.remotectrl.myevent.scenarios.load.MyLoad",
-          "--simulations-folder", "simulations/resources",
-          "--data-folder", "simulations/resources",
-          "--results-folder", "${buildDir}/reports/gatling"
-  ]
-}
+//task gatlingRun(type: JavaExec) {
+//  description = "Run gatling tests"
+//  new File("${buildDir}/reports/gatling").mkdirs()
+//  classpath = sourceSets.simulations.runtimeClasspath + configurations.gatling
+//  main = "io.gatling.app.Gatling"
+//  args = ["--simulation", "co.remotectrl.myevent.scenarios.load.MyLoad",
+//          "--simulations-folder", "simulations/resources",
+//          "--data-folder", "simulations/resources",
+//          "--results-folder", "${buildDir}/reports/gatling"
+//  ]
+//}
 
-task showConfigurations  {
-  doLast {
-    configurations.all { conf -> println(conf) }
-  }
-}
+//task showConfigurations  {
+//  doLast {
+//    configurations.all { conf -> println(conf) }
+//  }
+//}

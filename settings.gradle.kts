@@ -1,5 +1,4 @@
 rootProject.name = "myevent"
-enableFeaturePreview("GRADLE_METADATA")
 
 include (
  ":event-ctrl",
