@@ -14,8 +14,7 @@ gatling {
 }
 
 dependencies {
-  implementation "com.fasterxml.jackson.core:jackson-databind:2.12.3"
-  implementation project(":my-common")
-  gatling "com.fasterxml.jackson.core:jackson-databind:2.12.3"
-  gatling project(":my-common")
+  testImplementation "com.fasterxml.jackson.core:jackson-databind:2.12.3"
+  testImplementation project(":my-common")
+  gatlingImplementation project(":my-common")
 }
