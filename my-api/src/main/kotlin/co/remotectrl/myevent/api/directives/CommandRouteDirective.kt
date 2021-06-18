@@ -49,11 +49,11 @@ class CommandRouteDirective<TAggregate : CtrlAggregate<TAggregate>>(val routeAct
     }
 
     inline fun <reified TEvent : CtrlEvent<TAggregate>> playFor(aggregate: TAggregate, event: TEvent): TAggregate {
-        val mutable = CtrlMutableAggregate(aggregate)
+        val active = CtrlMutable(aggregate)
 
-        event.applyTo(mutable)
+        event.applyTo(active)
 
-        return mutable.aggregate
+        return active.aggregate
     }
 
     inline fun <reified TCommand : CtrlCommand<TAggregate>> askPlayPersist(aggregate: TAggregate, command: TCommand): CompletionStage<StatusCode> {

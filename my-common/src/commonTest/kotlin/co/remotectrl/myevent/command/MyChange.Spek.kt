@@ -5,6 +5,7 @@ import co.remotectrl.myevent.assert.AssertUtil
 import co.remotectrl.myevent.common.aggregate.MyAggregate
 import co.remotectrl.myevent.common.command.MyChangeCommand
 import co.remotectrl.myevent.common.event.MyChangedEvent
+import kotlin.test.Test
 
 class MyAggregateTest {
 
@@ -16,7 +17,8 @@ class MyAggregateTest {
             "blah"
     )
 
-    fun should_try_to_validate_Change_command_input() {
+    @Test
+    fun `should try to validate Change command input`() {
 
         AssertUtil.assertExecution(
                 MyChangeCommand("").executeOn(actual),
@@ -32,6 +34,7 @@ class MyAggregateTest {
 
     val eventLegend = EventLegend(evtId, aggregateId, 2)
 
+    @Test
     fun `should produce Changed event on successful Commit command`() {
         AssertUtil.assertExecution(
                 MyChangeCommand("change blah").executeOn(actual),
@@ -44,10 +47,11 @@ class MyAggregateTest {
         kotlin.test.assertEquals(actual.legend.latestVersion, expected.legend.latestVersion)
     }
 
+    @Test
     fun `should apply Changed event to the MyAggregate`() {
         val evt = MyChangedEvent(EventLegend(evtId, aggregateId, 2), "blah changed")
 
-        val actualMutableAggregate = CtrlMutableAggregate(actual)
+        val actualMutableAggregate = CtrlMutable(actual)
         evt.applyTo(actualMutableAggregate)
 
         AssertUtil.assertAggregateEvent(actualMutableAggregate.aggregate.legend, evt)

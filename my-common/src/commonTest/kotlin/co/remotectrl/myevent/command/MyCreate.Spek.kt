@@ -2,60 +2,62 @@ package co.remotectrl.myevent.command
 
 import co.remotectrl.ctrl.event.*
 import co.remotectrl.myevent.common.aggregate.MyAggregate
-import co.remotectrl.myevent.common.command.MyChangeCommand
 import co.remotectrl.myevent.common.command.MyCreateCommand
-import co.remotectrl.myevent.common.event.MyChangedEvent
 import co.remotectrl.myevent.common.event.MyCreatedEvent
 import co.remotectrl.myevent.assert.AssertUtil
 
 class MyCreateTest {
 
-        val aggregateIdVal = "1"
-        val aggregateId = AggregateId<MyAggregate>(aggregateIdVal)
+    val aggregateIdVal = "1"
+    val aggregateId = AggregateId<MyAggregate>(aggregateIdVal)
+    val actual = MyAggregate(
+            legend = AggregateLegend(
+                    aggregateId = aggregateId,
+                    latestVersion = 1
+            ),
+            myVal = "blah"
+    )
 
-        val actual = MyAggregate(
-                AggregateLegend(aggregateId, 1),
-                "blah"
+    fun `should try to validate Change Command command input`() {
+        AssertUtil.assertExecution(
+                MyCreateCommand("").executeOn(actual),
+                CtrlExecution.Invalidated(items = arrayOf(
+                        CtrlInvalidInput("myInitialVal should not be empty")
+                ))
         )
+    }
 
-        fun `should try to validate Change Command command input`() {
-            AssertUtil.assertExecution(
-                    MyCreateCommand("").executeOn(actual),
-                    CtrlExecution.Invalidated(items = arrayOf(
-                            CtrlInvalidInput("myInitialVal should not be empty")
-                    ))
-            )
-        }
+    val evtIdVal = "0"
+    val evtId = EventId<MyAggregate>(evtIdVal)
+    val eventLegend = EventLegend(
+            eventId = evtId,
+            aggregateId = aggregateId,
+            version = 2
+    )
 
-        val evtIdVal = "0"
-        val evtId = EventId<MyAggregate>(evtIdVal)
+    fun `should produce Changed Event on successful Commit Command`() {
 
-        val eventLegend = EventLegend(evtId, aggregateId, 2)
+        AssertUtil.assertExecution(
+                MyCreateCommand("initial blah").executeOn(actual),
+                CtrlExecution.Validated(event = MyCreatedEvent(eventLegend, "initial blah"))
+        )
+    }
 
-        fun `should produce Changed Event on successful Commit Command`() {
+    fun `should apply Changed Event to MyAggregate`() {
+        val evt = MyCreatedEvent(EventLegend(evtId, aggregateId, 2), "blah changed")
 
-            AssertUtil.assertExecution(
-                    MyCreateCommand("initial blah").executeOn(actual),
-                    CtrlExecution.Validated(event = MyCreatedEvent(eventLegend, "initial blah"))
-            )
-        }
+        val active = CtrlMutable(actual)
+        evt.applyTo(active)
 
-        fun assertModel(actual: MyAggregate, expected: MyAggregate) {
-            kotlin.test.assertEquals(actual.myVal, expected.myVal)
-            kotlin.test.assertEquals(actual.legend.latestVersion, expected.legend.latestVersion)
-        }
+        AssertUtil.assertAggregateEvent(active.aggregate.legend, evt)
 
-        fun `should apply Changed Event to MyAggregate`() {
-            val evt = MyCreatedEvent(EventLegend(evtId, aggregateId, 2), "blah changed")
+        val expected = MyAggregate(AggregateLegend(aggregateId, 2), "blah changed")
 
-            val actualMutableAggregate = CtrlMutableAggregate(actual)
-            evt.applyTo(actualMutableAggregate)
+        assertModel(active.aggregate, expected)
+    }
 
-            AssertUtil.assertAggregateEvent(actualMutableAggregate.aggregate.legend, evt)
-
-            val expected = MyAggregate(AggregateLegend(aggregateId, 2), "blah changed")
-
-            assertModel(actualMutableAggregate.aggregate, expected)
-        }
-
+    fun assertModel(actual: MyAggregate, expected: MyAggregate) {
+        kotlin.test.assertEquals(actual.myVal, expected.myVal)
+        kotlin.test.assertEquals(actual.legend.latestVersion, expected.legend.latestVersion)
+    }
 }

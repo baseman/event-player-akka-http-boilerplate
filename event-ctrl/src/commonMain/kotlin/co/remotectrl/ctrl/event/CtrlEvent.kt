@@ -6,12 +6,12 @@ interface CtrlEvent<TAggregate : CtrlAggregate<TAggregate>> {
 
     fun applyChangesTo(aggregate: TAggregate, latestVersion: Int): TAggregate
 
-    fun applyTo(mutable: CtrlMutableAggregate<TAggregate>) {
+    fun applyTo(mutable: CtrlMutable<TAggregate>) {
         mutable.aggregate = applyChangesTo(mutable.aggregate, legend.version)
     }
 }
 
-data class CtrlMutableAggregate<TAggregate : CtrlAggregate<TAggregate>>(var aggregate: TAggregate)
+data class CtrlMutable<TAggregate : CtrlAggregate<TAggregate>>(var aggregate: TAggregate)
 
 data class EventId<TAggregate>(val value: String) where TAggregate : CtrlAggregate<TAggregate>
 
