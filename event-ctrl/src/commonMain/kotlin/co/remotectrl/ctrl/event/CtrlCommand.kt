@@ -1,23 +1,23 @@
 package co.remotectrl.ctrl.event
 
-interface CtrlCommand<TAggregate : CtrlAggregate<TAggregate>> {
+interface CtrlCommand<TRoot : CtrlRoot<TRoot>> {
 
-    fun getEventLegend(aggregateId: AggregateId<TAggregate>, version: Int): EventLegend<TAggregate> {
+    fun getEventLegend(rootId: RootId<TRoot>, version: Int): EventLegend<TRoot> {
         return EventLegend(
                 0.toString(),
-                aggregateId.value,
+                rootId.value,
                 version
         )
     }
 
-    fun getEvent(eventLegend: EventLegend<TAggregate>): CtrlEvent<TAggregate>
+    fun getEvent(eventLegend: EventLegend<TRoot>): CtrlEvent<TRoot>
 
-    fun validate(aggregate: TAggregate, validation: CtrlValidation)
+    fun validate(root: TRoot, validation: CtrlValidation)
 
-    fun executeOn(aggregate: TAggregate): CtrlExecution<TAggregate, CtrlEvent<TAggregate>, CtrlInvalidation> {
+    fun executeOn(root: TRoot): CtrlExecution<TRoot, CtrlEvent<TRoot>, CtrlInvalidation> {
         val validation = CtrlValidation(mutableListOf())
 
-        validate(aggregate, validation)
+        validate(root, validation)
 
         val validatedItems = validation.invalidInputItems.toTypedArray()
 
@@ -25,7 +25,7 @@ interface CtrlCommand<TAggregate : CtrlAggregate<TAggregate>> {
         else {
             CtrlExecution.Validated(
                     event = getEvent(
-                            getEventLegend(aggregateId = aggregate.legend.aggregateId, version = aggregate.legend.latestVersion + 1)
+                            getEventLegend(rootId = root.legend.rootId, version = root.legend.latestVersion + 1)
                     )
             )
         }
@@ -34,17 +34,17 @@ interface CtrlCommand<TAggregate : CtrlAggregate<TAggregate>> {
 
 @Suppress("FINAL_UPPER_BOUND")
 sealed class CtrlExecution<
-        TAggregate : CtrlAggregate<TAggregate>,
-        out TEvent : CtrlEvent<TAggregate>,
+        TRoot : CtrlRoot<TRoot>,
+        out TEvent : CtrlEvent<TRoot>,
         out TInvalid : CtrlInvalidation
         > {
-    data class Validated<TAggregate : CtrlAggregate<TAggregate>, out TEvent : CtrlEvent<TAggregate>>(
-        val event: CtrlEvent<TAggregate>
-    ) : CtrlExecution<TAggregate, TEvent, Nothing>()
+    data class Validated<TRoot : CtrlRoot<TRoot>, out TEvent : CtrlEvent<TRoot>>(
+        val event: CtrlEvent<TRoot>
+    ) : CtrlExecution<TRoot, TEvent, Nothing>()
 
-    data class Invalidated<TAggregate : CtrlAggregate<TAggregate>>(
+    data class Invalidated<TRoot : CtrlRoot<TRoot>>(
         val items: Array<CtrlInvalidInput>
-    ) : CtrlExecution<TAggregate, Nothing, CtrlInvalidation>() {
+    ) : CtrlExecution<TRoot, Nothing, CtrlInvalidation>() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other == null || this::class != other::class) return false

@@ -55,32 +55,53 @@ class RouteTest : JUnitRouteTest() {
                 )
         ).assertStatusCode(StatusCodes.OK)
 
-        val changeCommandName = MyChangeCommand::class.java.name.toLowerCase()
-        testRoute(appServer.route).run(
-                HttpRequest.POST("/my/cmd/1").withEntity(
-                        MediaTypes.applicationWithFixedCharset("vnd.$changeCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
-                        ObjectMapper().writeValueAsString(MyChangeCommand("blah"))
-                        )
-        ).assertStatusCode(StatusCodes.OK)
-
         //dto
         testRoute(appServer.route).run(
                 HttpRequest.GET("/my/items")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("[{\"legend\":{\"aggregateId\":{\"value\":\"1\"},\"latestVersion\":2},\"myVal\":\"blah\"}]")
+                .assertEntity("[{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"1\"}},\"myVal\":\"initial blah\"}]")
 
         testRoute(appServer.route).run(
                 HttpRequest.GET("/my/item/1")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("{\"legend\":{\"aggregateId\":{\"value\":\"1\"},\"latestVersion\":2},\"myVal\":\"blah\"}")
+                .assertEntity("{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"1\"}},\"myVal\":\"initial blah\"}")
+
+        val myCommandName = MyCreateCommand::class.java.name.toLowerCase()
+        testRoute(appServer.route).run(
+                HttpRequest.POST("/my/cmd").withEntity(
+                        MediaTypes.applicationWithFixedCharset("vnd.$myCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
+                        ObjectMapper().writeValueAsString(MyCreateCommand(myInitialVal = "name"))
+                )
+        ).assertStatusCode(StatusCodes.OK)
+
+        testRoute(appServer.route).run(
+                HttpRequest.GET("/my/items")
+        )
+                .assertStatusCode(StatusCodes.OK)
+                .assertEntity("[{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"1\"}},\"myVal\":\"initial blah\"},{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"2\"}},\"myVal\":\"name\"}]"
+                )
+
+        testRoute(appServer.route).run(
+                HttpRequest.GET("/my/item/2")
+        )
+                .assertStatusCode(StatusCodes.OK)
+                .assertEntity("{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"2\"}},\"myVal\":\"name\"}")
+
+        val changeCommandName = MyChangeCommand::class.java.name.toLowerCase()
+        testRoute(appServer.route).run(
+                HttpRequest.POST("/my/cmd/1").withEntity(
+                        MediaTypes.applicationWithFixedCharset("vnd.$changeCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
+                        ObjectMapper().writeValueAsString(MyChangeCommand("blah"))
+                )
+        ).assertStatusCode(StatusCodes.OK)
 
 
         //todo: generic errors is likely a sign which testing a library maybe more suitable that testing at the api level -- identify if this is possible
         //error
         testRoute(appServer.route).run(
-                HttpRequest.POST("/my/cmd/2").withEntity(
+                HttpRequest.POST("/my/cmd/3").withEntity(
                         MediaTypes.applicationWithFixedCharset("vnd.$changeCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
                         ObjectMapper().writeValueAsString(MyChangeCommand("blah"))
                 )
@@ -102,7 +123,7 @@ class RouteTest : JUnitRouteTest() {
 
 
         testRoute(appServer.route).run(
-                HttpRequest.GET("/my/item/2")
+                HttpRequest.GET("/my/item/3")
         ).assertStatusCode(StatusCodes.NOT_FOUND)
     }
 }

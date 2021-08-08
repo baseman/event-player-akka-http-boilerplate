@@ -6,7 +6,7 @@ const CommandConsumer = CommandContext.Consumer;
 
 class CommandStore extends Component {
     state = {
-        //todo: possible create js map of commands per aggregateId to parallelize cmd exec
+        //todo: possible create js map of commands per rootId to parallelize cmd exec
         items: [],
         deadLetterItems: [],
         isProcessing: false,

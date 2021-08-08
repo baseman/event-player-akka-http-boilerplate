@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import {CommandStore} from "./components/context/aggregate/store/CommandStore";
-import {MyDtoStore} from "./components/context/aggregate/store/MyDtoStore";
+import {CommandStore} from "./components/context/root/store/CommandStore";
+import {MyDtoStore} from "./components/context/root/store/MyDtoStore";
 import MyDto from "./components/MyDto";
 
 function MyAppStore({children}) {

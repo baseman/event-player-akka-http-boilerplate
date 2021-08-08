@@ -9,38 +9,39 @@ import akka.http.javadsl.server.directives.RouteDirectives
 import akka.pattern.PatternsCS
 import akka.util.Timeout
 import co.remotectrl.ctrl.event.*
-import co.remotectrl.myevent.api.actors.AggregateCommandMessages
-import co.remotectrl.myevent.api.actors.AggregateDtoMessages
+import co.remotectrl.myevent.api.actors.RootCommandMessages
+import co.remotectrl.myevent.api.actors.RootDtoMessages
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 
-class CommandRouteDirective<TAggregate : CtrlAggregate<TAggregate>>(val routeActor: ActorRef, val timeout: Timeout) : RouteDirectives() {
+class CommandRouteDirective<TRoot : CtrlRoot<TRoot>>(val routeActor: ActorRef, val timeout: Timeout) : RouteDirectives() {
 
-    val commandUnmarshaller = CommandUnmarshallingDirective<TAggregate>()
+    val commandUnmarshaller = CommandUnmarshallingDirective<TRoot>()
 
     val invalidInputHandler: ExceptionHandler = ExceptionHandler.newBuilder().match(IllegalArgumentException::class.java) { e ->
         complete(StatusCodes.BAD_REQUEST, e.message)
     }.build()
 
-    inline fun <reified TCommand : CtrlCommand<TAggregate>> commandExecute(noinline factory: (AggregateLegend<TAggregate>) -> TAggregate): Route = handleExceptions(invalidInputHandler) {
+    inline fun <reified TCommand : CtrlCommand<TRoot>> commandExecute(
+        noinline factory: (RootLegend<TRoot>) -> TRoot): Route = handleExceptions(invalidInputHandler) {
         commandUnmarshaller.commandEntity<TCommand> { command ->
-            val created = askGetNewItem(factory = factory).thenCompose { aggregate ->
-                askPlayPersist(aggregate = aggregate as TAggregate, command = command)
+            val created = askGetNewItem(factory = factory).thenCompose { root ->
+                askPlayPersist(root = root as TRoot, command = command)
             }
 
             onSuccess<StatusCode>({ created }, this::complete)
         }
     }
 
-    inline fun <reified TCommand : CtrlCommand<TAggregate>> commandExecute(aggregateId: String): Route = handleExceptions(invalidInputHandler) {
+    inline fun <reified TCommand : CtrlCommand<TRoot>> commandExecute(rootId: String): Route = handleExceptions(invalidInputHandler) {
 
         commandUnmarshaller.commandEntity<TCommand> { command ->
 
-            val tryCmdCompleted = askGetItem(aggregateId).thenCompose<StatusCode> { aggregate ->
+            val tryCmdCompleted = askGetItem(rootId).thenCompose<StatusCode> { root ->
 
-                if (aggregate == null) {
+                if (root == null) {
                     CompletableFuture.completedFuture(StatusCodes.NOT_FOUND)
-                } else askPlayPersist(aggregate = aggregate, command = command)
+                } else askPlayPersist(root = root, command = command)
             }
 
             onSuccess<StatusCode>({ tryCmdCompleted }, this::complete)
@@ -48,22 +49,22 @@ class CommandRouteDirective<TAggregate : CtrlAggregate<TAggregate>>(val routeAct
 
     }
 
-    inline fun <reified TEvent : CtrlEvent<TAggregate>> playFor(aggregate: TAggregate, event: TEvent): TAggregate {
-        val active = CtrlMutable(aggregate)
+    inline fun <reified TEvent : CtrlEvent<TRoot>> playFor(root: TRoot, event: TEvent): TRoot {
+        val active = CtrlMutable(root)
 
         event.applyTo(active)
 
-        return active.aggregate
+        return active.root
     }
 
-    inline fun <reified TCommand : CtrlCommand<TAggregate>> askPlayPersist(aggregate: TAggregate, command: TCommand): CompletionStage<StatusCode> {
-        val exe = command.executeOn(aggregate)
+    inline fun <reified TCommand : CtrlCommand<TRoot>> askPlayPersist(root: TRoot, command: TCommand): CompletionStage<StatusCode> {
+        val exe = command.executeOn(root)
 
         val exeStage = when (exe) {
             is CtrlExecution.Validated -> {
                 PatternsCS.ask(
                         routeActor,
-                        AggregateCommandMessages.Persist(aggregate = playFor(aggregate = aggregate, event = exe.event)),
+                        RootCommandMessages.Persist(root = playFor(root = root, event = exe.event)),
                         timeout
                 ).thenApply { StatusCodes.OK }
             }
@@ -80,25 +81,25 @@ class CommandRouteDirective<TAggregate : CtrlAggregate<TAggregate>>(val routeAct
         }
     }
 
-    fun askGetNewItem(factory: (AggregateLegend<TAggregate>) -> TAggregate): CompletionStage<TAggregate> {
+    fun askGetNewItem(factory: (RootLegend<TRoot>) -> TRoot): CompletionStage<TRoot> {
         return PatternsCS.ask(
                 routeActor,
-                AggregateDtoMessages.GetNewId(),
+                RootDtoMessages.GetNewId(),
                 timeout
         ).thenApply { obj ->
             factory(
-                    AggregateLegend(aggregateIdVal = (obj as AggregateDtoMessages.ReturnId).value, latestVersion = 0)
+                    RootLegend(rootIdVal = (obj as RootDtoMessages.ReturnId).value, latestVersion = 0)
             )
         }
     }
 
-    fun askGetItem(aggregateId: String): CompletionStage<TAggregate?> {
+    fun askGetItem(rootId: String): CompletionStage<TRoot?> {
         return PatternsCS.ask(
                 routeActor,
-                AggregateDtoMessages.GetItem(AggregateId<TAggregate>(aggregateId)),
+                RootDtoMessages.GetItem(RootId<TRoot>(rootId)),
                 timeout
         ).thenApply { obj ->
-            (obj as AggregateDtoMessages.ReturnItem<TAggregate>).item
+            (obj as RootDtoMessages.ReturnItem<TRoot>).item
         }
     }
 }

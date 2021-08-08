@@ -3,11 +3,11 @@ import React from 'react';
 import MyTask from "./tasks/MyTask";
 import MyItems from "./MyItems";
 
-import {MyDtoConsumer} from "./context/aggregate/store/MyDtoStore"
+import {MyDtoConsumer} from "./context/root/store/MyDtoStore"
 
-import {MyDtoProxy} from "./context/aggregate/proxy/MyDtoProxy"
-import {CommandProxy} from "./context/aggregate/proxy/CommandProxy";
-import {CommandConsumer} from "./context/aggregate/store/CommandStore";
+import {MyDtoProxy} from "./context/root/proxy/MyDtoProxy"
+import {CommandProxy} from "./context/root/proxy/CommandProxy";
+import {CommandConsumer} from "./context/root/store/CommandStore";
 
 function MyAppConsumer({children}) {
     return (<CommandConsumer>

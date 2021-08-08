@@ -8,11 +8,11 @@ import akka.http.javadsl.server.PathMatchers
 import akka.http.javadsl.server.Route
 import akka.pattern.PatternsCS
 import akka.util.Timeout
-import co.remotectrl.ctrl.event.AggregateId
-import co.remotectrl.ctrl.event.CtrlAggregate
+import co.remotectrl.ctrl.event.RootId
+import co.remotectrl.ctrl.event.CtrlRoot
 import io.swagger.annotations.*
-import co.remotectrl.myevent.api.actors.AggregateDtoMessages
-import co.remotectrl.myevent.common.aggregate.MyAggregate
+import co.remotectrl.myevent.api.actors.RootDtoMessages
+import co.remotectrl.myevent.common.root.MyRoot
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
@@ -22,14 +22,14 @@ import javax.ws.rs.Produces
 @Produces("application/json")
 class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDirectives() {
     @GET
-    @Path("/item/{aggregateId}")
+    @Path("/item/{rootId}")
     @Produces("application/json")
     @ApiOperation(value = "get item by id", code = 200, nickname = "execute")
     @ApiImplicitParams(value = [
-        (ApiImplicitParam(name = "aggregateId", value = "id for which item to return", required = true, paramType = "path", dataType = "integer"))
+        (ApiImplicitParam(name = "rootId", value = "id for which item to return", required = true, paramType = "path", dataType = "integer"))
     ])
     @ApiResponses(value = [
-        (ApiResponse(code = 200, response = MyAggregate::class, message = "item results")),
+        (ApiResponse(code = 200, response = MyRoot::class, message = "item results")),
         (ApiResponse(code = 404, message = "item not found"))
     ])
     fun getForIdRoute(): Route? {
@@ -37,18 +37,18 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
         return rejectEmptyResponse {
         pathPrefix("item") {
 
-                path<String>(PathMatchers.segment()) { aggregateId ->
+                path<String>(PathMatchers.segment()) { rootId ->
                     //            get {
                     val returnItem = PatternsCS.ask(
                             dtoActor,
-                            AggregateDtoMessages.GetItem<MyAggregate>(AggregateId(aggregateId)),
+                            RootDtoMessages.GetItem<MyRoot>(RootId(rootId)),
                             timeout
-                    ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItem<MyAggregate> }
+                    ).thenApply { obj -> obj as RootDtoMessages.ReturnItem<MyRoot> }
 
-                    onSuccess<AggregateDtoMessages.ReturnItem<MyAggregate>>({ returnItem }, { result ->
+                    onSuccess<RootDtoMessages.ReturnItem<MyRoot>>({ returnItem }, { result ->
                         when {
                             result.item == null -> complete("")
-                            else -> complete<MyAggregate>(StatusCodes.OK, result.item, Jackson.marshaller())
+                            else -> complete<MyRoot>(StatusCodes.OK, result.item, Jackson.marshaller())
                         }
                     })
 
@@ -64,19 +64,19 @@ class MyDtoRouter(private val dtoActor: ActorRef, val timeout: Timeout) : AllDir
     @Produces("application/json")
     @ApiOperation(value = "get all items", code = 200, nickname = "execute")
     @ApiResponses(value = [
-        (ApiResponse(code = 200, response = Array<MyAggregate>::class, message = "item list results"))
+        (ApiResponse(code = 200, response = Array<MyRoot>::class, message = "item list results"))
     ])
     fun getRoute(): Route? {
         return pathPrefix("items") {
             get {
                 val returnItems = PatternsCS.ask(
                         dtoActor,
-                        AggregateDtoMessages.GetItems(),
+                        RootDtoMessages.GetItems(),
                         timeout
-                ).thenApply { obj -> obj as AggregateDtoMessages.ReturnItems }
+                ).thenApply { obj -> obj as RootDtoMessages.ReturnItems }
 
-                onSuccess<AggregateDtoMessages.ReturnItems>({ returnItems }, { result ->
-                    complete<Array<CtrlAggregate<*>>>(StatusCodes.OK, result.items, Jackson.marshaller())
+                onSuccess<RootDtoMessages.ReturnItems>({ returnItems }, { result ->
+                    complete<Array<CtrlRoot<*>>>(StatusCodes.OK, result.items, Jackson.marshaller())
                 })
             }
         }

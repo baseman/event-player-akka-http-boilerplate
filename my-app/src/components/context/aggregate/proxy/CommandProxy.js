@@ -2,8 +2,8 @@ import config from "../../../../config/poll.config";
 
 function thenablePost(command) {
 
-    //todo: create new aggregate from server -- identify ally project creation
-    //todo: replace command.aggregateId.val with aggregate.aggregateId.val
+    //todo: create new root from server -- identify ally project creation
+    //todo: replace command.rootId.val with root.rootId.val
     const postUrl = config.host + "/my/cmd";
     return fetch(postUrl, {
         method: "post",

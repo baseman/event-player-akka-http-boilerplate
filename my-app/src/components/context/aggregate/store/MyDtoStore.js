@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 const MyDtoContext = React.createContext();
 const MyDtoConsumer = MyDtoContext.Consumer;
 
-// todo: AggregateContext
+// todo: RootContext
 class MyDtoStore extends Component {
     state = {
         items: [],

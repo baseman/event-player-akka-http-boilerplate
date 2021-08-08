@@ -1,25 +1,25 @@
 package co.remotectrl.myevent.api.services
 
-import co.remotectrl.ctrl.event.AggregateId
-import co.remotectrl.ctrl.event.CtrlAggregate
+import co.remotectrl.ctrl.event.RootId
+import co.remotectrl.ctrl.event.CtrlRoot
 
 class MyService {
 
-    fun commit(items: MutableList<Any>, aggregate: CtrlAggregate<*>) {
+    fun commit(items: MutableList<Any>, root: CtrlRoot<*>) {
 
         val itemIndex = items.indexOfFirst {
-            (it as CtrlAggregate<*>).legend.aggregateId.value == aggregate.legend.aggregateId.value
+            (it as CtrlRoot<*>).legend.rootId.value == root.legend.rootId.value
         }
 
         when (itemIndex) {
             -1 -> {
-                items.add(aggregate)
+                items.add(root)
 
                 if(seed >= 1){
                     seed--
                 }
             }
-            else -> items[itemIndex] = aggregate
+            else -> items[itemIndex] = root
         }
     }
 
@@ -30,11 +30,11 @@ class MyService {
         return (items.size + seed).toString()
     }
 
-    fun getAggregates(items: MutableList<CtrlAggregate<*>>): Array<CtrlAggregate<*>> {
+    fun geTRoots(items: MutableList<CtrlRoot<*>>): Array<CtrlRoot<*>> {
         return items.toTypedArray()
     }
 
-    fun getAggregate(items: MutableList<CtrlAggregate<*>>, aggregateId: AggregateId<out CtrlAggregate<*>>): CtrlAggregate<*>? {
-        return getAggregates(items).find { it.legend.aggregateId.value == aggregateId.value }
+    fun geTRoot(items: MutableList<CtrlRoot<*>>, rootId: RootId<out CtrlRoot<*>>): CtrlRoot<*>? {
+        return geTRoots(items).find { it.legend.rootId.value == rootId.value }
     }
 }

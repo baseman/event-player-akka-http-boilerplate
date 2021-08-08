@@ -2,23 +2,23 @@ package co.remotectrl.myevent.command
 
 import co.remotectrl.ctrl.event.*
 import co.remotectrl.myevent.assert.AssertUtil
-import co.remotectrl.myevent.common.aggregate.MyAggregate
+import co.remotectrl.myevent.common.root.MyRoot
 import co.remotectrl.myevent.common.command.MyChangeCommand
 import co.remotectrl.myevent.common.event.MyChangedEvent
 import kotlin.test.Test
 
-class MyAggregateTest {
+class MyRootTest {
 
-    val aggregateIdVal = "1"
-    val aggregateId = AggregateId<MyAggregate>(aggregateIdVal)
+    val rootIdVal = "1"
+    val rootId = RootId<MyRoot>(rootIdVal)
 
-    val actual = MyAggregate(
-            AggregateLegend(aggregateId, 1),
+    val actual = MyRoot(
+            RootLegend(rootId, 1),
             "blah"
     )
 
     @Test
-    fun `should try to validate Change command input`() {
+    fun should_try_to_validate_Change_command_input() {
 
         AssertUtil.assertExecution(
                 MyChangeCommand("").executeOn(actual),
@@ -30,35 +30,35 @@ class MyAggregateTest {
     }
 
     val evtIdVal = "0"
-    val evtId = EventId<MyAggregate>(evtIdVal)
+    val evtId = EventId<MyRoot>(evtIdVal)
 
-    val eventLegend = EventLegend(evtId, aggregateId, 2)
+    val eventLegend = EventLegend(evtId, rootId, 2)
 
     @Test
-    fun `should produce Changed event on successful Commit command`() {
+    fun should_produce_Changed_event_on_successful_Commit_command() {
         AssertUtil.assertExecution(
                 MyChangeCommand("change blah").executeOn(actual),
                 CtrlExecution.Validated(event = MyChangedEvent(eventLegend, "change blah"))
         )
     }
 
-    fun assertModel(actual: MyAggregate, expected: MyAggregate) {
+    fun assertModel(actual: MyRoot, expected: MyRoot) {
         kotlin.test.assertEquals(actual.myVal, expected.myVal)
         kotlin.test.assertEquals(actual.legend.latestVersion, expected.legend.latestVersion)
     }
 
     @Test
-    fun `should apply Changed event to the MyAggregate`() {
-        val evt = MyChangedEvent(EventLegend(evtId, aggregateId, 2), "blah changed")
+    fun should_apply_Changed_event_to_the_MyRoot() {
+        val evt = MyChangedEvent(EventLegend(evtId, rootId, 2), "blah changed")
 
-        val actualMutableAggregate = CtrlMutable(actual)
-        evt.applyTo(actualMutableAggregate)
+        val actualMutableRoot = CtrlMutable(actual)
+        evt.applyTo(actualMutableRoot)
 
-        AssertUtil.assertAggregateEvent(actualMutableAggregate.aggregate.legend, evt)
+        AssertUtil.asserTRootEvent(actualMutableRoot.root.legend, evt)
 
-        val expected = MyAggregate(AggregateLegend(aggregateId, 2), "blah changed")
+        val expected = MyRoot(RootLegend(rootId, 2), "blah changed")
 
-        assertModel(actualMutableAggregate.aggregate, expected)
+        assertModel(actualMutableRoot.root, expected)
     }
 
 }

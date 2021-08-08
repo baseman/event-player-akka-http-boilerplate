@@ -2,11 +2,10 @@ package co.remotectrl.myevent.api.actors
 
 import akka.actor.AbstractActor
 import akka.event.Logging
-import co.remotectrl.ctrl.event.AggregateId
-import co.remotectrl.ctrl.event.CtrlAggregate
+import co.remotectrl.ctrl.event.RootId
+import co.remotectrl.ctrl.event.CtrlRoot
 import co.remotectrl.myevent.api.services.MyService
 import org.springframework.context.annotation.Scope
-import org.springframework.stereotype.Component
 
 @Scope("prototype")
 class MyActor(private val myService: MyService) : AbstractActor() {
@@ -23,37 +22,37 @@ class MyActor(private val myService: MyService) : AbstractActor() {
 
     override fun createReceive(): Receive {
         return receiveBuilder()
-                .match(AggregateCommandMessages.Persist::class.java) {
+                .match(RootCommandMessages.Persist::class.java) {
 
                     try {
                         myService.commit(
                                 MyRepository.items,
-                                aggregate = it.aggregate
+                                root = it.root
                         )
 
-                        sender.tell(AggregateCommandMessages.ActionPerformed(), self)
+                        sender.tell(RootCommandMessages.ActionPerformed(), self)
 
                     } catch (e: Error) {
-                        sender.tell(AggregateCommandMessages.ActionPerformed(), self)
+                        sender.tell(RootCommandMessages.ActionPerformed(), self)
                     }
 
                 }
-                .match(AggregateDtoMessages.GetNewId::class.java) {
-                    sender.tell(AggregateDtoMessages.ReturnId(value = myService.getId(MyRepository.items)), self)
+                .match(RootDtoMessages.GetNewId::class.java) {
+                    sender.tell(RootDtoMessages.ReturnId(value = myService.getId(MyRepository.items)), self)
                 }
-                .match(AggregateDtoMessages.GetItems::class.java) { getMsgs ->
+                .match(RootDtoMessages.GetItems::class.java) { getMsgs ->
 
                     sender.let {
-                        val items = myService.getAggregates(MyRepository.items as MutableList<CtrlAggregate<*>>)
-                        it.tell(AggregateDtoMessages.ReturnItems(items = items), self)
+                        val items = myService.geTRoots(MyRepository.items as MutableList<CtrlRoot<*>>)
+                        it.tell(RootDtoMessages.ReturnItems(items = items), self)
                     }
 
                 }
-                .match(AggregateDtoMessages.GetItem::class.java) { getMsg ->
+                .match(RootDtoMessages.GetItem::class.java) { getMsg ->
 
                     sender.let {
-                        val item = myService.getAggregate(MyRepository.items as MutableList<CtrlAggregate<*>>, getMsg.aggregateId)
-                        it.tell(AggregateDtoMessages.ReturnItem(item = item), self)
+                        val item = myService.geTRoot(MyRepository.items as MutableList<CtrlRoot<*>>, getMsg.rootId)
+                        it.tell(RootDtoMessages.ReturnItem(item = item), self)
                     }
 
                 }
@@ -64,16 +63,16 @@ class MyActor(private val myService: MyService) : AbstractActor() {
 
 }
 
-interface AggregateDtoMessages{
-    class GetItem<TAggregate : CtrlAggregate<TAggregate>>(val aggregateId: AggregateId<TAggregate>)
+interface RootDtoMessages{
+    class GetItem<TRoot : CtrlRoot<TRoot>>(val rootId: RootId<TRoot>)
     class GetItems
-    class ReturnItem<TAggregate : CtrlAggregate<*>>(val item: TAggregate?)
-    class ReturnItems(val items: Array<CtrlAggregate<*>>)
+    class ReturnItem<TRoot : CtrlRoot<*>>(val item: TRoot?)
+    class ReturnItems(val items: Array<CtrlRoot<*>>)
     class GetNewId
     class ReturnId(val value: String)
 }
 
-interface AggregateCommandMessages{
-    class Persist<TAggregate : CtrlAggregate<TAggregate>>(val aggregate: TAggregate)
+interface RootCommandMessages{
+    class Persist<TRoot : CtrlRoot<TRoot>>(val root: TRoot)
     class ActionPerformed
 }

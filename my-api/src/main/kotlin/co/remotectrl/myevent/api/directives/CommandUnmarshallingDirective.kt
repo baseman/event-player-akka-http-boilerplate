@@ -7,15 +7,15 @@ import akka.http.javadsl.model.MediaTypes
 import akka.http.javadsl.server.Route
 import akka.http.javadsl.server.directives.MarshallingDirectives
 import akka.http.javadsl.unmarshalling.Unmarshaller
-import co.remotectrl.ctrl.event.CtrlAggregate
+import co.remotectrl.ctrl.event.CtrlRoot
 import co.remotectrl.ctrl.event.CtrlCommand
 import com.fasterxml.jackson.databind.ObjectMapper
 
-class CommandUnmarshallingDirective<TAggregate : CtrlAggregate<TAggregate>> : MarshallingDirectives() {
+class CommandUnmarshallingDirective<TRoot : CtrlRoot<TRoot>> : MarshallingDirectives() {
 
     val deserializer = ObjectMapper()
 
-    inline fun <reified TCommand : CtrlCommand<TAggregate>> commandEntity(
+    inline fun <reified TCommand : CtrlCommand<TRoot>> commandEntity(
             noinline inner: (TCommand) -> Route
     ): Route = entity(getCommandUnmarshaller(), inner)
 
