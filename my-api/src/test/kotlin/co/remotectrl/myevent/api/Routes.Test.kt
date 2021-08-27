@@ -6,6 +6,7 @@ import akka.http.javadsl.model.MediaTypes
 import akka.http.javadsl.model.StatusCodes
 import akka.http.javadsl.testkit.JUnitRouteTest
 import co.remotectrl.myevent.common.command.MyChangeCommand
+import co.remotectrl.myevent.common.command.MyComposeCommand
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -76,18 +77,26 @@ class RouteTest : JUnitRouteTest() {
                 )
         ).assertStatusCode(StatusCodes.OK)
 
+        val myComposeCommandName = MyComposeCommand::class.java.name.toLowerCase()
+        testRoute(appServer.route).run(
+            HttpRequest.POST("/my/cmd/2").withEntity(
+                MediaTypes.applicationWithFixedCharset("vnd.$myComposeCommandName.api.v1+json", HttpCharsets.UTF_8).toContentType(),
+                ObjectMapper().writeValueAsString(MyComposeCommand(myChangeVal = "change val", myComposeVal = "compose val"))
+            )
+        ).assertStatusCode(StatusCodes.OK)
+
         testRoute(appServer.route).run(
                 HttpRequest.GET("/my/items")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("[{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"1\"}},\"myVal\":\"initial blah\"},{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"2\"}},\"myVal\":\"name\"}]"
+                .assertEntity("[{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"1\"}},\"myVal\":\"initial blah\"},{\"legend\":{\"latestVersion\":2,\"rootId\":{\"value\":\"2\"}},\"myVal\":\"change val + compose val\"}]"
                 )
 
         testRoute(appServer.route).run(
                 HttpRequest.GET("/my/item/2")
         )
                 .assertStatusCode(StatusCodes.OK)
-                .assertEntity("{\"legend\":{\"latestVersion\":1,\"rootId\":{\"value\":\"2\"}},\"myVal\":\"name\"}")
+                .assertEntity("{\"legend\":{\"latestVersion\":2,\"rootId\":{\"value\":\"2\"}},\"myVal\":\"change val + compose val\"}")
 
         val changeCommandName = MyChangeCommand::class.java.name.toLowerCase()
         testRoute(appServer.route).run(

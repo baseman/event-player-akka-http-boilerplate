@@ -3,11 +3,11 @@ package co.remotectrl.myevent.command
 import co.remotectrl.ctrl.event.*
 import co.remotectrl.myevent.assert.AssertUtil
 import co.remotectrl.myevent.common.root.MyRoot
-import co.remotectrl.myevent.common.command.MyChangeCommand
-import co.remotectrl.myevent.common.event.MyChangedEvent
+import co.remotectrl.myevent.common.command.MyComposeCommand
+import co.remotectrl.myevent.common.event.MyComposedEvent
 import kotlin.test.Test
 
-class MyChangeTest {
+class MyComposeChangeTest {
 
     val rootIdVal = "1"
     val rootId = RootId<MyRoot>(rootIdVal)
@@ -21,10 +21,17 @@ class MyChangeTest {
     fun should_try_to_validate_Change_command_input() {
 
         AssertUtil.assertExecution(
-                MyChangeCommand("").executeOn(actual),
+                MyComposeCommand("", "blah").executeOn(actual),
                 CtrlExecution.Invalidated(items = arrayOf(
                         CtrlInvalidInput("myInitialVal should not be empty")
                 ))
+        )
+
+        AssertUtil.assertExecution(
+            MyComposeCommand("blah", "blah").executeOn(actual),
+            CtrlExecution.Invalidated(items = arrayOf(
+                CtrlInvalidInput("compose value cannot be change value")
+            ))
         )
 
     }
@@ -37,8 +44,10 @@ class MyChangeTest {
     @Test
     fun should_produce_Changed_event_on_successful_Commit_command() {
         AssertUtil.assertExecution(
-                MyChangeCommand("change blah").executeOn(actual),
-                CtrlExecution.Validated(event = MyChangedEvent(eventLegend, "change blah"))
+                MyComposeCommand("change blah", "compose blah").executeOn(actual),
+                CtrlExecution.Validated(
+                    event = MyComposedEvent(eventLegend, "change blah", "compose blah")
+                )
         )
     }
 
@@ -49,14 +58,18 @@ class MyChangeTest {
 
     @Test
     fun should_apply_Changed_event_to_the_MyRoot() {
-        val evt = MyChangedEvent(EventLegend(evtId, rootId, 2), "blah changed")
+        val evt = MyComposedEvent(
+            EventLegend(evtId, rootId, 2),
+            "blah changed",
+            "blah composed"
+        )
 
         val actualMutableRoot = CtrlMutable(actual)
         evt.applyTo(actualMutableRoot)
 
         AssertUtil.asserTRootEvent(actualMutableRoot.root.legend, evt)
 
-        val expected = MyRoot(RootLegend(rootId, 2), "blah changed")
+        val expected = MyRoot(RootLegend(rootId, 2), "blah changed + blah composed")
 
         assertModel(actualMutableRoot.root, expected)
     }

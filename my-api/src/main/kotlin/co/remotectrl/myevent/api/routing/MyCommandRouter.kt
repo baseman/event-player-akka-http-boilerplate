@@ -11,6 +11,7 @@ import co.remotectrl.myevent.api.actors.RootCommandMessages
 import co.remotectrl.myevent.api.directives.CommandRouteDirective
 import co.remotectrl.myevent.common.root.MyRoot
 import co.remotectrl.myevent.common.command.MyChangeCommand
+import co.remotectrl.myevent.common.command.MyComposeCommand
 import co.remotectrl.myevent.common.command.MyCreateCommand
 import javax.ws.rs.Consumes
 import javax.ws.rs.POST
@@ -66,7 +67,8 @@ class MyCommandRouter(
     @Path("/cmd/{rootId}")
     @Produces("application/json")
     @Consumes(value = [
-        MyChangeCommand.mediaType
+        MyChangeCommand.mediaType,
+        MyComposeCommand.mediaType
     ])
     @ApiOperation(value = "execute my commands", code = 200, nickname = "execute", response = RootCommandMessages.ActionPerformed::class)
     @ApiImplicitParams(value = [
@@ -83,7 +85,8 @@ class MyCommandRouter(
                 path<String>(PathMatchers.segment()) { rootId ->
                     post {
                         route(
-                                commandHandler.commandExecute<MyChangeCommand>(rootId) //todo: can add additional routes here
+                                commandHandler.commandExecute<MyChangeCommand>(rootId), //todo: can add additional routes here
+                                commandHandler.commandExecute<MyComposeCommand>(rootId)
                         )
                     }
                 }
