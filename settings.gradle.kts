@@ -2,7 +2,7 @@ rootProject.name = "myevent"
 
 include (
  ":event-ctrl",
- ":my-common",
- ":my-api",
- ":my-scenarios"
+ ":shoppingcart-common",
+ ":shoppingcart-api",
+ ":shoppingcart-scenarios"
 )
